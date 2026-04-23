@@ -17,3 +17,7 @@ export const goalSchema = z.object({
 export const goalContributionSchema = z.object({
   amount: z.coerce.number().positive()
 });
+
+export const balanceAdjustmentSchema = z.object({
+  targetAmount: z.coerce.number()
+});

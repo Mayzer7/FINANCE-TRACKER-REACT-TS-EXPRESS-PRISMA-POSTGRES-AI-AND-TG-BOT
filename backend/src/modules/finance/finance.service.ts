@@ -1,11 +1,11 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type BalanceAdjustment, type Transaction } from "@prisma/client";
 import { HttpError } from "../../lib/http-error.js";
 import { prisma } from "../../lib/prisma.js";
 import { serializeCategory, serializeGoal, serializeTransaction } from "./finance.serializer.js";
 
 export const financeService = {
   async getDashboard(userId: string) {
-    const [categories, transactions, goals] = await Promise.all([
+    const [categories, transactions, goals, adjustments] = await Promise.all([
       prisma.category.findMany({
         where: { userId },
         orderBy: [{ type: "asc" }, { name: "asc" }],
@@ -18,10 +18,14 @@ export const financeService = {
         where: { userId },
         orderBy: { createdAt: "desc" },
       }),
+      prisma.balanceAdjustment.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }),
     ]);
 
-    const summary = transactions.reduce(
-      (acc, transaction) => {
+    const summaryBase = transactions.reduce(
+      (acc: { income: number; expenses: number; balance: number }, transaction: Transaction) => {
         const amount = Number(transaction.amount);
         if (transaction.type === "INCOME") {
           acc.income += amount;
@@ -34,8 +38,16 @@ export const financeService = {
       { income: 0, expenses: 0, balance: 0 }
     );
 
+    const adjustmentTotal = adjustments.reduce(
+      (acc: number, adjustment: BalanceAdjustment) => acc + Number(adjustment.amount),
+      0
+    );
+
     return {
-      summary,
+      summary: {
+        ...summaryBase,
+        balance: summaryBase.balance + adjustmentTotal,
+      },
       categories: categories.map(serializeCategory),
       transactions: transactions.map(serializeTransaction),
       goals: goals.map(serializeGoal),
@@ -82,6 +94,45 @@ export const financeService = {
     });
 
     return serializeGoal(goal);
+  },
+
+  async setBalanceTarget(userId: string, targetAmount: number) {
+    const [transactions, adjustments] = await Promise.all([
+      prisma.transaction.findMany({
+        where: { userId },
+        select: { amount: true, type: true },
+      }),
+      prisma.balanceAdjustment.findMany({
+        where: { userId },
+        select: { amount: true },
+      }),
+    ]);
+
+    const transactionBalance = transactions.reduce((acc: number, transaction: { amount: Prisma.Decimal; type: "INCOME" | "EXPENSE" }) => {
+      const amount = Number(transaction.amount);
+      return transaction.type === "INCOME" ? acc + amount : acc - amount;
+    }, 0);
+
+    const adjustmentBalance = adjustments.reduce(
+      (acc: number, adjustment: { amount: Prisma.Decimal }) => acc + Number(adjustment.amount),
+      0
+    );
+
+    const currentBalance = transactionBalance + adjustmentBalance;
+    const delta = targetAmount - currentBalance;
+
+    if (delta === 0) {
+      return { balance: currentBalance };
+    }
+
+    await prisma.balanceAdjustment.create({
+      data: {
+        userId,
+        amount: new Prisma.Decimal(delta),
+      },
+    });
+
+    return { balance: targetAmount };
   },
 
   async contributeToGoal(userId: string, goalId: string, amount: number) {

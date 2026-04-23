@@ -1,0 +1,86 @@
+.page {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+.card,
+.logoutCard {
+  padding: 1.6rem;
+  border-radius: 1.8rem;
+}
+
+.card h3,
+.logoutCard h3 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.description {
+  margin: 0.9rem 0 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.accountMeta {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+.accountMeta div {
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.accountMeta span,
+.field span {
+  color: var(--text-muted);
+}
+
+.accountMeta strong {
+  font-weight: 600;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.3rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.success {
+  margin: 0;
+  color: var(--positive);
+}
+
+.logoutCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logoutCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

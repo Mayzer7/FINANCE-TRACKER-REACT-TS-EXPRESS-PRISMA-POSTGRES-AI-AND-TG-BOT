@@ -10,6 +10,7 @@ import { GoalsPage } from "@/pages/GoalsPage";
 import { IncomePage } from "@/pages/IncomePage";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { ProfilePage } from "@/pages/ProfilePage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { TransactionsPage } from "@/pages/TransactionsPage";
 
@@ -50,6 +51,7 @@ function App() {
                 <Route path="income" element={<IncomePage />} />
                 <Route path="transactions" element={<TransactionsPage />} />
                 <Route path="goals" element={<GoalsPage />} />
+                <Route path="profile" element={<ProfilePage />} />
               </Route>
               <Route path="*" element={<AuthEntryRedirect />} />
             </Routes>

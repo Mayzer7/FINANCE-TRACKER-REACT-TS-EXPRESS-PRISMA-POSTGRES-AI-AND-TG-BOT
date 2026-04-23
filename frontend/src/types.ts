@@ -39,6 +39,10 @@ export type DashboardData = {
   summary: Summary;
 };
 
+export type BalanceTargetResult = {
+  balance: number;
+};
+
 export type AuthUser = {
   sub: string;
   email: string;

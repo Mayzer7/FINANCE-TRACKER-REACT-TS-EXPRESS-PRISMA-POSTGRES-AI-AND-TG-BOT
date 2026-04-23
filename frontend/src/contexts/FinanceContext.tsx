@@ -44,14 +44,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       }
 
       if (!session?.token) {
-        await Promise.resolve();
         setState(emptyDashboard);
         setError("");
         setIsLoading(false);
         return;
       }
 
-      await Promise.resolve();
       setIsLoading(true);
       setError("");
 
@@ -105,6 +103,26 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const setBalanceTarget: FinanceContextValue["setBalanceTarget"] = async (targetAmount) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.setBalanceTarget(session.token, targetAmount);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error:
+          errorValue instanceof ApiError
+            ? errorValue.message
+            : "Не удалось обновить текущий баланс",
+      };
+    }
+  };
+
   const contributeToGoal: FinanceContextValue["contributeToGoal"] = async (goalId, amount) => {
     if (!session?.token) {
       return { ok: false, error: "Сессия не найдена" };
@@ -117,8 +135,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error:
-          errorValue instanceof ApiError ? errorValue.message : "Не удалось пополнить цель",
+        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось пополнить цель",
       };
     }
   };
@@ -132,6 +149,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     refresh,
     addTransaction,
     addGoal,
+    setBalanceTarget,
     contributeToGoal,
     getSummary,
   };

@@ -1,4 +1,4 @@
-import type { DashboardData, Goal, Transaction, TransactionType } from "@/types";
+import type { BalanceTargetResult, DashboardData, Goal, Transaction, TransactionType } from "@/types";
 import { apiRequest } from "./api";
 
 export const financeApi = {
@@ -29,6 +29,13 @@ export const financeApi = {
       method: "POST",
       token,
       body: JSON.stringify(payload),
+    });
+  },
+  setBalanceTarget(token: string, targetAmount: number) {
+    return apiRequest<BalanceTargetResult>("/finance/balance-adjustments", {
+      method: "POST",
+      token,
+      body: JSON.stringify({ targetAmount }),
     });
   },
   contributeToGoal(token: string, goalId: string, amount: number) {

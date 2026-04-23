@@ -56,11 +56,6 @@
   color: var(--brand);
 }
 
-.email {
-  color: var(--text-muted);
-  margin: 0.25rem 0 0;
-}
-
 .dashboard {
   padding: 2rem clamp(1rem, 2vw, 3rem) 2.5rem;
   animation: rise-in 500ms ease both;

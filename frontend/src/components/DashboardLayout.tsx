@@ -1,5 +1,4 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 import { useFinance } from "@/hooks/useFinance";
 import { useTheme } from "@/hooks/useTheme";
 import { formatCurrency, formatSignedCurrency } from "@/utils/format";
@@ -8,8 +7,8 @@ import styles from "./DashboardLayout.module.css";
 const navItems = [
   { to: "/app/expenses", label: "Расходы", icon: "↘" },
   { to: "/app/income", label: "Доходы", icon: "↗" },
-  { to: "/app/transactions", label: "Все транзакции", icon: "⇅" },
-  { to: "/app/goals", label: "Цели", icon: "◎" },
+  { to: "/app/transactions", label: "Все транзакции", icon: "⇄" },
+  { to: "/app/goals", label: "Цели", icon: "◉" },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -17,10 +16,10 @@ const pageTitles: Record<string, string> = {
   "/app/income": "Доходы",
   "/app/transactions": "Все транзакции",
   "/app/goals": "Цели",
+  "/app/profile": "Профиль",
 };
 
 export function DashboardLayout() {
-  const { logout, session } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { getSummary } = useFinance();
   const location = useLocation();
@@ -53,20 +52,17 @@ export function DashboardLayout() {
         <div className={styles.footer}>
           <button className={styles.navItem} type="button" onClick={toggleTheme}>
             <span>{theme === "dark" ? "☼" : "☾"}</span>
-            {theme === "dark" ? "Светлая тема" : "Темная тема"}
+            {theme === "dark" ? "Светлая тема" : "Тёмная тема"}
           </button>
-          <button
-            className={styles.navItem}
-            type="button"
-            onClick={() => {
-              logout();
-              navigate("/login");
-            }}
+          <NavLink
+            to="/app/profile"
+            className={({ isActive }) =>
+              isActive ? `${styles.navItem} ${styles.navItemActive}` : styles.navItem
+            }
           >
-            <span>⎋</span>
-            Выйти
-          </button>
-          <p className={styles.email}>{session?.email}</p>
+            <span>◌</span>
+            Профиль
+          </NavLink>
         </div>
       </aside>
 
@@ -84,9 +80,7 @@ export function DashboardLayout() {
             </div>
             <div className={styles.summaryChip}>
               <span>Расходы</span>
-              <strong className={styles.negative}>
-                {formatSignedCurrency(-summary.expenses)}
-              </strong>
+              <strong className={styles.negative}>{formatSignedCurrency(-summary.expenses)}</strong>
             </div>
           </div>
         </header>

@@ -9,4 +9,5 @@ financeRouter.use(requireAuth);
 financeRouter.get("/dashboard", asyncHandler(financeController.getDashboard));
 financeRouter.post("/transactions", asyncHandler(financeController.createTransaction));
 financeRouter.post("/goals", asyncHandler(financeController.createGoal));
+financeRouter.post("/balance-adjustments", asyncHandler(financeController.setBalanceTarget));
 financeRouter.post("/goals/:goalId/contributions", asyncHandler(financeController.contributeToGoal));
