@@ -1,0 +1,43 @@
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.card {
+  width: min(100%, 28rem);
+  padding: 2rem;
+  border-radius: 2rem;
+  animation: rise-in 500ms ease both;
+}
+
+.copy h1 {
+  margin: 1.7rem 0 0.3rem;
+  font-size: clamp(2.6rem, 6vw, 3.5rem);
+}
+
+.copy p,
+.footnote {
+  color: var(--text-muted);
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.footnote {
+  margin: 1.4rem 0 0;
+  text-align: center;
+}
+
+.footnote a {
+  color: var(--brand);
+}

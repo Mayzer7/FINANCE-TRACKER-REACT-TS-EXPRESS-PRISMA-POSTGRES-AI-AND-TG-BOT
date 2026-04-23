@@ -1,0 +1,61 @@
+.panel {
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.title {
+  padding: 1.4rem 1.6rem 0;
+  color: var(--text-muted);
+}
+
+.card {
+  padding: 1.2rem 1.6rem 1.6rem;
+}
+
+.chart {
+  width: min(16rem, 100%);
+  aspect-ratio: 1;
+  margin: 1rem auto 1.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.inner {
+  width: 56%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--panel);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.inner strong {
+  font-size: 2rem;
+}
+
+.legendList {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.legendLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.legendLabel i {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  display: inline-block;
+}

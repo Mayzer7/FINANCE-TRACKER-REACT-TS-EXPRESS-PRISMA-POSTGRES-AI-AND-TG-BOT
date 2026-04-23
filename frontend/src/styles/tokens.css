@@ -1,0 +1,45 @@
+:root {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: #f4f1eb;
+  background:
+    radial-gradient(circle at top left, rgba(101, 155, 126, 0.22), transparent 34%),
+    radial-gradient(circle at 80% 20%, rgba(143, 109, 75, 0.16), transparent 30%),
+    linear-gradient(135deg, #081411 0%, #111313 55%, #171513 100%);
+  --bg: #091311;
+  --bg-soft: rgba(14, 23, 20, 0.84);
+  --bg-elevated: rgba(17, 27, 23, 0.92);
+  --panel: rgba(12, 22, 19, 0.88);
+  --panel-border: rgba(130, 154, 140, 0.12);
+  --text: #f4f1eb;
+  --text-muted: #9da39e;
+  --brand: #82be93;
+  --brand-deep: #688d73;
+  --positive: #7fd0a3;
+  --negative: #d9a489;
+  --danger: #e59a84;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+  --radius-xl: 2rem;
+  --radius-lg: 1.5rem;
+  --transition-base: 180ms ease;
+}
+
+:root[data-theme="light"] {
+  color: #1e241f;
+  background:
+    radial-gradient(circle at top left, rgba(143, 175, 146, 0.22), transparent 36%),
+    radial-gradient(circle at 80% 10%, rgba(226, 190, 164, 0.18), transparent 28%),
+    linear-gradient(135deg, #f3f1ea 0%, #f5efe7 60%, #f4ede5 100%);
+  --bg: #f3f1ea;
+  --bg-soft: rgba(255, 252, 247, 0.82);
+  --bg-elevated: rgba(255, 255, 255, 0.88);
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-border: rgba(126, 145, 126, 0.14);
+  --text: #222421;
+  --text-muted: #6d726b;
+  --brand: #7ea889;
+  --brand-deep: #6b9173;
+  --positive: #5ca66e;
+  --negative: #b8866b;
+  --danger: #cb7f6c;
+  --shadow: 0 24px 60px rgba(118, 111, 92, 0.16);
+}

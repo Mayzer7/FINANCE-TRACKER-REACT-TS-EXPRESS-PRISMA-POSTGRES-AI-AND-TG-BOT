@@ -1,0 +1,67 @@
+.panel {
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.title {
+  padding: 1.4rem 1.6rem 0;
+  color: var(--text-muted);
+}
+
+.list {
+  display: grid;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.4rem;
+  border-top: 1px solid var(--panel-border);
+}
+
+.badge {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+}
+
+.copy strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.copy span {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.amount {
+  white-space: nowrap;
+  font-size: 1.1rem;
+}
+
+.amountIncome {
+  color: var(--positive);
+}
+
+.emptyState {
+  padding: 2rem;
+  border: 1px dashed var(--panel-border);
+  border-radius: 1.5rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .item {
+    grid-template-columns: auto 1fr;
+  }
+
+  .amount {
+    grid-column: 2;
+  }
+}

@@ -1,0 +1,138 @@
+.shell {
+  display: grid;
+  grid-template-columns: 15rem 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.75rem 1.35rem;
+  border-radius: 0;
+  border-right-color: var(--panel-border);
+}
+
+.brandButton {
+  width: fit-content;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.nav,
+.footer {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  transition: transform var(--transition-base), background var(--transition-base);
+}
+
+.navItem:hover {
+  transform: translateY(-1px);
+}
+
+.navItemActive {
+  background: rgba(130, 190, 147, 0.14);
+  color: var(--brand);
+}
+
+.email {
+  color: var(--text-muted);
+  margin: 0.25rem 0 0;
+}
+
+.dashboard {
+  padding: 2rem clamp(1rem, 2vw, 3rem) 2.5rem;
+  animation: rise-in 500ms ease both;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.balance {
+  margin: 0;
+  font-size: clamp(3rem, 5vw, 4.6rem);
+  line-height: 0.9;
+}
+
+.title {
+  margin: 1rem 0 0;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+}
+
+.summaryRow {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.summaryChip {
+  min-width: 8rem;
+  text-align: right;
+}
+
+.summaryChip span {
+  display: block;
+  color: var(--text-muted);
+}
+
+.positive {
+  color: var(--positive);
+}
+
+.negative {
+  color: var(--negative);
+}
+
+@media (max-width: 980px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    border-right: 0;
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .header {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
