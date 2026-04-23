@@ -1,19 +1,28 @@
 .page {
   min-height: 100vh;
-  padding: 2rem clamp(1rem, 2vw, 2.5rem) 3rem;
+  padding: 2rem clamp(1rem, 2.2vw, 2.75rem) 4rem;
 }
 
-.header,
-.hero,
-.featureGrid {
-  animation: rise-in 500ms ease both;
+.content {
+  display: grid;
+  gap: 1.2rem;
 }
 
 .header {
+  position: sticky;
+  top: 1rem;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-soft) 80%, transparent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
 }
 
 .actions {
@@ -22,29 +31,221 @@
   gap: 0.75rem;
 }
 
+.themeToggle {
+  flex-shrink: 0;
+}
+
+.reveal {
+  animation: rise-in 700ms ease both;
+}
+
 .hero {
-  max-width: 58rem;
-  padding: 10vh 0 4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(19rem, 0.95fr);
+  gap: 2rem;
+  align-items: center;
+  padding: 7vh 0 3rem;
 }
 
-.hero h1 {
+.heroCopy h1 {
   margin: 0;
-  max-width: 11ch;
-  font-size: clamp(4rem, 8vw, 6.9rem);
-  line-height: 0.95;
+  max-width: 10.5ch;
+  font-size: clamp(4.3rem, 8vw, 7.4rem);
+  line-height: 0.92;
 }
 
-.hero h1 em {
+.heroCopy h1 em {
   color: var(--text-muted);
   font-style: italic;
 }
 
-.hero p {
-  max-width: 32rem;
-  margin: 1.8rem 0 2.1rem;
+.heroCopy p {
+  max-width: 34rem;
+  margin: 1.7rem 0 2rem;
   color: var(--text-muted);
-  font-size: 1.25rem;
-  line-height: 1.7;
+  font-size: 1.24rem;
+  line-height: 1.72;
+}
+
+.heroActions,
+.finalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.heroPreview {
+  position: relative;
+  min-height: 34rem;
+}
+
+.previewShell,
+.goalCard,
+.aiSection,
+.showcasePanel,
+.flowCard,
+.featureCard {
+  border-radius: 2rem;
+}
+
+.previewShell {
+  position: relative;
+  padding: 1.45rem;
+  overflow: hidden;
+}
+
+.previewShell::before {
+  content: "";
+  position: absolute;
+  inset: auto -10% -25% 45%;
+  height: 13rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(130, 190, 147, 0.26), transparent 70%);
+  pointer-events: none;
+}
+
+.previewTopline,
+.miniHeader,
+.goalCardHeader,
+.goalMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.previewTopline,
+.miniHeader {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.previewBalance {
+  display: grid;
+  gap: 0.4rem;
+  margin: 1.45rem 0 1.7rem;
+}
+
+.previewBalance small,
+.goalMeta span,
+.goalCardHeader span,
+.miniCards small,
+.goalFootnote {
+  color: var(--text-muted);
+}
+
+.previewBalance strong {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(3.1rem, 5vw, 4.4rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.previewColumns {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.previewChart {
+  display: grid;
+  place-items: center;
+  gap: 0.95rem;
+}
+
+.previewChart p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.ring {
+  display: grid;
+  place-items: center;
+  width: 11rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 58%, color-mix(in srgb, var(--bg) 78%, transparent) 59%),
+    conic-gradient(var(--brand) 0 72%, rgba(255, 255, 255, 0.08) 72% 100%);
+  animation: pulse-ring 7s ease-in-out infinite;
+}
+
+.ringInner {
+  display: grid;
+  place-items: center;
+  width: 6rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg-elevated) 86%, transparent);
+  border: 1px solid var(--panel-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.ringInner span {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2rem;
+}
+
+.previewList,
+.transactionFeed {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.previewList div,
+.transactionFeed div,
+.miniCards div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.previewList span,
+.transactionFeed span {
+  color: var(--text-muted);
+}
+
+.previewList strong,
+.transactionFeed strong,
+.miniCards strong,
+.goalMeta strong,
+.metricItem strong {
+  font-weight: 600;
+}
+
+.floatingCard {
+  position: absolute;
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 1.1rem;
+  animation: float-card 6s ease-in-out infinite;
+}
+
+.floatingCard span {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.floatingCard strong {
+  font-size: 1.1rem;
+}
+
+.floatingIncome {
+  top: 8%;
+  right: -0.5rem;
+}
+
+.floatingGoal {
+  bottom: 10%;
+  left: -0.7rem;
+  animation-delay: -2s;
 }
 
 .featureGrid {
@@ -54,9 +255,19 @@
 }
 
 .featureCard {
-  min-height: 10rem;
-  padding: 1.6rem;
-  border-radius: 1.9rem;
+  min-height: 11rem;
+  padding: 1.7rem;
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.featureCard:hover,
+.flowCard:hover,
+.showcasePanel:hover,
+.goalCard:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--panel-border));
 }
 
 .featureCard h2 {
@@ -64,30 +275,395 @@
   font-size: 2rem;
 }
 
-.featureCard p {
+.featureCard p,
+.showcaseCopy p,
+.flowCard p,
+.goalCopy p,
+.aiIntro p,
+.finalCta p {
   margin: 0;
   color: var(--text-muted);
   line-height: 1.7;
 }
 
-@media (max-width: 980px) {
-  .featureGrid {
-    grid-template-columns: 1fr;
+.showcase,
+.goalSection,
+.aiSection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.4rem;
+  align-items: center;
+  padding: 1.4rem;
+}
+
+.showcase {
+  padding: 2rem 1.5rem;
+}
+
+.showcaseCopy h2,
+.sectionHeading h2,
+.goalCopy h2,
+.aiIntro h2,
+.finalCta h2 {
+  margin: 0.2rem 0 1rem;
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  line-height: 0.98;
+}
+
+.showcaseVisual {
+  position: relative;
+  min-height: 22rem;
+}
+
+.showcasePanel {
+  position: absolute;
+  width: min(100%, 27rem);
+  padding: 1.3rem;
+}
+
+.showcasePanel:first-child {
+  top: 0;
+  right: 1rem;
+}
+
+.offsetPanel {
+  bottom: 0;
+  left: 0;
+}
+
+.barCluster {
+  display: flex;
+  align-items: end;
+  gap: 0.7rem;
+  height: 10rem;
+  margin: 1.6rem 0;
+}
+
+.barCluster span {
+  flex: 1;
+  min-width: 1.25rem;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 88%, white), var(--brand-deep));
+  opacity: 0.95;
+}
+
+.miniCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.metricsRibbon {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 2rem;
+  background: color-mix(in srgb, var(--panel-border) 45%, transparent);
+}
+
+.metricItem {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.4rem 1.2rem;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+}
+
+.metricItem strong {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2.2rem;
+}
+
+.metricItem span {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.sectionHeading {
+  max-width: 42rem;
+  margin-bottom: 0.8rem;
+}
+
+.flowSection {
+  padding: 1rem 0;
+}
+
+.flowGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.flowCard {
+  padding: 1.5rem;
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.flowNumber {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--brand);
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.flowCard h3 {
+  margin: 0 0 0.7rem;
+  font-size: 2rem;
+}
+
+.goalCopy {
+  max-width: 34rem;
+}
+
+.goalList {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.goalList li {
+  position: relative;
+  padding-left: 1.4rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.goalList li::before {
+  content: "";
+  position: absolute;
+  top: 0.62rem;
+  left: 0;
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.goalCard {
+  display: grid;
+  gap: 1.2rem;
+  padding: 1.6rem;
+}
+
+.goalCardHeader h3 {
+  margin: 0.35rem 0 0;
+  font-size: 2.4rem;
+}
+
+.goalProgress {
+  height: 0.95rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.goalProgressFill {
+  width: 67%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-deep), var(--brand));
+  animation: progress-fill 1.4s ease both 300ms;
+}
+
+.goalFootnote {
+  padding: 1rem 1.1rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--panel-border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.aiSection {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--panel-border));
+  background:
+    radial-gradient(circle at top left, rgba(130, 190, 147, 0.14), transparent 35%),
+    color-mix(in srgb, var(--panel) 92%, transparent);
+}
+
+.aiSection::before {
+  content: "";
+  position: absolute;
+  inset: auto -12% -24% auto;
+  width: 18rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(130, 190, 147, 0.2), transparent 72%);
+  pointer-events: none;
+}
+
+.aiChat {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.25rem;
+}
+
+.assistantBubble,
+.userBubble {
+  max-width: 85%;
+  padding: 0.95rem 1rem;
+  border-radius: 1.3rem;
+  line-height: 1.65;
+}
+
+.assistantBubble {
+  justify-self: start;
+  border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--panel-border));
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.userBubble {
+  justify-self: end;
+  background: color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+.finalCta {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  text-align: center;
+  border: 1px solid var(--panel-border);
+  border-radius: 2.25rem;
+  background:
+    radial-gradient(circle at top, rgba(130, 190, 147, 0.16), transparent 38%),
+    color-mix(in srgb, var(--panel) 90%, transparent);
+}
+
+.finalCta p {
+  max-width: 40rem;
+  margin-bottom: 1rem;
+}
+
+@keyframes float-card {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 
-@media (max-width: 640px) {
+@keyframes pulse-ring {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes progress-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 67%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .floatingCard,
+  .ring,
+  .goalProgressFill {
+    animation: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .hero,
+  .showcase,
+  .goalSection,
+  .aiSection {
+    grid-template-columns: 1fr;
+  }
+
+  .heroPreview,
+  .showcaseVisual {
+    min-height: auto;
+  }
+
+  .showcasePanel {
+    position: relative;
+    width: 100%;
+  }
+
+  .showcasePanel:first-child,
+  .offsetPanel {
+    inset: auto;
+  }
+
+  .showcaseVisual {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .metricsRibbon,
+  .flowGrid,
+  .featureGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 1rem 1rem 3rem;
+  }
+
   .header,
-  .actions {
+  .actions,
+  .heroActions,
+  .finalActions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .hero {
-    padding-top: 5rem;
+  .header {
+    position: static;
+    border-radius: 1.6rem;
   }
 
-  .hero h1 {
-    font-size: 3.4rem;
+  .hero {
+    padding-top: 2rem;
+  }
+
+  .heroCopy h1 {
+    font-size: 3.9rem;
+  }
+
+  .previewColumns,
+  .miniCards,
+  .metricsRibbon,
+  .flowGrid,
+  .featureGrid,
+  .goalMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .floatingIncome,
+  .floatingGoal {
+    position: static;
+  }
+
+  .heroPreview {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .showcase,
+  .goalSection,
+  .aiSection,
+  .finalCta {
+    padding: 1.2rem;
   }
 }
