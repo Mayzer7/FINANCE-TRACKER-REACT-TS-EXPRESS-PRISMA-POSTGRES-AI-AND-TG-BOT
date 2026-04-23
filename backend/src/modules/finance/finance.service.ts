@@ -1,33 +1,28 @@
 import { Prisma } from "@prisma/client";
 import { HttpError } from "../../lib/http-error.js";
 import { prisma } from "../../lib/prisma.js";
-
-const toNumber = (value: Prisma.Decimal) => Number(value);
+import { serializeCategory, serializeGoal, serializeTransaction } from "./finance.serializer.js";
 
 export const financeService = {
   async getDashboard(userId: string) {
     const [categories, transactions, goals] = await Promise.all([
       prisma.category.findMany({
         where: { userId },
-        orderBy: [{ type: "asc" }, { name: "asc" }]
+        orderBy: [{ type: "asc" }, { name: "asc" }],
       }),
       prisma.transaction.findMany({
         where: { userId },
-        include: { category: true },
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
       }),
       prisma.goal.findMany({
         where: { userId },
-        orderBy: { createdAt: "desc" }
-      })
+        orderBy: { createdAt: "desc" },
+      }),
     ]);
 
     const summary = transactions.reduce(
-      (
-        acc: { income: number; expenses: number; balance: number },
-        transaction: (typeof transactions)[number]
-      ) => {
-        const amount = toNumber(transaction.amount);
+      (acc, transaction) => {
+        const amount = Number(transaction.amount);
         if (transaction.type === "INCOME") {
           acc.income += amount;
         } else {
@@ -41,16 +36,9 @@ export const financeService = {
 
     return {
       summary,
-      categories,
-      transactions: transactions.map((transaction: (typeof transactions)[number]) => ({
-        ...transaction,
-        amount: toNumber(transaction.amount)
-      })),
-      goals: goals.map((goal: (typeof goals)[number]) => ({
-        ...goal,
-        targetAmount: toNumber(goal.targetAmount),
-        currentAmount: toNumber(goal.currentAmount)
-      }))
+      categories: categories.map(serializeCategory),
+      transactions: transactions.map(serializeTransaction),
+      goals: goals.map(serializeGoal),
     };
   },
 
@@ -59,7 +47,7 @@ export const financeService = {
     payload: { title: string; amount: number; type: "EXPENSE" | "INCOME"; categoryId: string }
   ) {
     const category = await prisma.category.findFirst({
-      where: { id: payload.categoryId, userId, type: payload.type }
+      where: { id: payload.categoryId, userId, type: payload.type },
     });
 
     if (!category) {
@@ -72,15 +60,11 @@ export const financeService = {
         amount: new Prisma.Decimal(payload.amount),
         type: payload.type,
         categoryId: payload.categoryId,
-        userId
+        userId,
       },
-      include: { category: true }
     });
 
-    return {
-      ...transaction,
-      amount: toNumber(transaction.amount)
-    };
+    return serializeTransaction(transaction);
   },
 
   async createGoal(
@@ -93,15 +77,11 @@ export const financeService = {
         title: payload.title,
         description: payload.description,
         targetAmount: new Prisma.Decimal(payload.targetAmount),
-        currentAmount: new Prisma.Decimal(payload.currentAmount)
-      }
+        currentAmount: new Prisma.Decimal(payload.currentAmount),
+      },
     });
 
-    return {
-      ...goal,
-      targetAmount: toNumber(goal.targetAmount),
-      currentAmount: toNumber(goal.currentAmount)
-    };
+    return serializeGoal(goal);
   },
 
   async contributeToGoal(userId: string, goalId: string, amount: number) {
@@ -111,21 +91,17 @@ export const financeService = {
     }
 
     const nextCurrentAmount = Math.min(
-      toNumber(existingGoal.targetAmount),
-      toNumber(existingGoal.currentAmount) + amount
+      Number(existingGoal.targetAmount),
+      Number(existingGoal.currentAmount) + amount
     );
 
     const goal = await prisma.goal.update({
       where: { id: goalId },
       data: {
-        currentAmount: new Prisma.Decimal(nextCurrentAmount)
-      }
+        currentAmount: new Prisma.Decimal(nextCurrentAmount),
+      },
     });
 
-    return {
-      ...goal,
-      targetAmount: toNumber(goal.targetAmount),
-      currentAmount: toNumber(goal.currentAmount)
-    };
-  }
+    return serializeGoal(goal);
+  },
 };

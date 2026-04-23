@@ -18,10 +18,11 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
     categories.find((item) => item.type === defaultType)?.id ?? ""
   );
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const scopedCategories = categories.filter((category) => category.type === type);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!title.trim() || !amount || Number(amount) <= 0 || !categoryId) {
@@ -29,12 +30,23 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
       return;
     }
 
-    addTransaction({
+    setIsSubmitting(true);
+    setError("");
+
+    const result = await addTransaction({
       title: title.trim(),
       amount: Number(amount),
       categoryId,
       type,
     });
+
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      setError(result.error ?? "Не удалось добавить операцию");
+      return;
+    }
+
     onClose();
   };
 
@@ -43,7 +55,11 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
       <form className={formStyles.form} onSubmit={handleSubmit}>
         <div className={formStyles.pillSwitch}>
           <button
-            className={type === "expense" ? `${formStyles.pillItem} ${formStyles.pillItemActive}` : formStyles.pillItem}
+            className={
+              type === "expense"
+                ? `${formStyles.pillItem} ${formStyles.pillItemActive}`
+                : formStyles.pillItem
+            }
             type="button"
             onClick={() => {
               setType("expense");
@@ -53,7 +69,11 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
             Расход
           </button>
           <button
-            className={type === "income" ? `${formStyles.pillItem} ${formStyles.pillItemActive}` : formStyles.pillItem}
+            className={
+              type === "income"
+                ? `${formStyles.pillItem} ${formStyles.pillItemActive}`
+                : formStyles.pillItem
+            }
             type="button"
             onClick={() => {
               setType("income");
@@ -86,8 +106,8 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
           </select>
         </label>
         {error ? <p className="form-error">{error}</p> : null}
-        <button className="button button-primary button-full" type="submit">
-          Добавить
+        <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Сохраняем..." : "Добавить"}
         </button>
       </form>
     </Modal>

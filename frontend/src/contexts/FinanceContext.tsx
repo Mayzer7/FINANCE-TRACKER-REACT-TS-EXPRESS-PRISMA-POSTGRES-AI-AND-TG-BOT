@@ -1,86 +1,135 @@
-import { useState, type ReactNode } from "react";
-import { mockFinanceStore, type FinanceState } from "@/services/mockFinanceStore";
-import { FinanceContext, type FinanceContextValue } from "./FinanceContext.shared";
+import { useEffect, useState, type ReactNode } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { ApiError } from "@/services/api";
+import { financeApi } from "@/services/financeApi";
+import type { DashboardData } from "@/types";
+import { emptyDashboard, FinanceContext, type FinanceContextValue } from "./FinanceContext.shared";
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<FinanceState>(mockFinanceStore.load);
+  const { session, logout, isLoading: isAuthLoading } = useAuth();
+  const [state, setState] = useState<DashboardData>(emptyDashboard);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const addTransaction: FinanceContextValue["addTransaction"] = (payload) => {
-    setState((prev) => {
-      const next: FinanceState = {
-        ...prev,
-        transactions: [
-          {
-            id: `tx-${Date.now()}`,
-            title: payload.title,
-            amount: payload.amount,
-            categoryId: payload.categoryId,
-            type: payload.type,
-            createdAt: new Date().toISOString(),
-          },
-          ...prev.transactions,
-        ],
-      };
-      mockFinanceStore.save(next);
-      return next;
-    });
-  };
+  const refresh = async () => {
+    if (!session?.token) {
+      setState(emptyDashboard);
+      setError("");
+      setIsLoading(false);
+      return;
+    }
 
-  const addGoal: FinanceContextValue["addGoal"] = (payload) => {
-    setState((prev) => {
-      const next: FinanceState = {
-        ...prev,
-        goals: [
-          {
-            id: `goal-${Date.now()}`,
-            title: payload.title,
-            description: payload.description,
-            targetAmount: payload.targetAmount,
-            currentAmount: payload.currentAmount,
-          },
-          ...prev.goals,
-        ],
-      };
-      mockFinanceStore.save(next);
-      return next;
-    });
-  };
+    setIsLoading(true);
+    setError("");
 
-  const contributeToGoal: FinanceContextValue["contributeToGoal"] = (goalId, amount) => {
-    setState((prev) => {
-      const next: FinanceState = {
-        ...prev,
-        goals: prev.goals.map((goal) =>
-          goal.id !== goalId
-            ? goal
-            : {
-                ...goal,
-                currentAmount: Math.min(goal.targetAmount, goal.currentAmount + amount),
-              }
-        ),
-      };
-      mockFinanceStore.save(next);
-      return next;
-    });
-  };
-
-  const getSummary = () => {
-    let income = 0;
-    let expenses = 0;
-
-    state.transactions.forEach((transaction) => {
-      if (transaction.type === "income") {
-        income += transaction.amount;
-      } else {
-        expenses += transaction.amount;
+    try {
+      const dashboard = await financeApi.getDashboard(session.token);
+      setState(dashboard);
+    } catch (errorValue) {
+      const message =
+        errorValue instanceof ApiError ? errorValue.message : "Не удалось загрузить данные";
+      setError(message);
+      if (errorValue instanceof ApiError && errorValue.status === 401) {
+        logout();
       }
-    });
-
-    return { income, expenses, balance: income - expenses };
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    void (async () => {
+      if (isAuthLoading) {
+        return;
+      }
+
+      if (!session?.token) {
+        await Promise.resolve();
+        setState(emptyDashboard);
+        setError("");
+        setIsLoading(false);
+        return;
+      }
+
+      await Promise.resolve();
+      setIsLoading(true);
+      setError("");
+
+      try {
+        const dashboard = await financeApi.getDashboard(session.token);
+        setState(dashboard);
+      } catch (errorValue) {
+        const message =
+          errorValue instanceof ApiError ? errorValue.message : "Не удалось загрузить данные";
+        setError(message);
+        if (errorValue instanceof ApiError && errorValue.status === 401) {
+          logout();
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [session?.token, isAuthLoading, logout]);
+
+  const addTransaction: FinanceContextValue["addTransaction"] = async (payload) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.createTransaction(session.token, payload);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось добавить операцию",
+      };
+    }
+  };
+
+  const addGoal: FinanceContextValue["addGoal"] = async (payload) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.createGoal(session.token, payload);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось создать цель",
+      };
+    }
+  };
+
+  const contributeToGoal: FinanceContextValue["contributeToGoal"] = async (goalId, amount) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.contributeToGoal(session.token, goalId, amount);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error:
+          errorValue instanceof ApiError ? errorValue.message : "Не удалось пополнить цель",
+      };
+    }
+  };
+
+  const getSummary = () => state.summary;
 
   const value: FinanceContextValue = {
     ...state,
+    isLoading,
+    error,
+    refresh,
     addTransaction,
     addGoal,
     contributeToGoal,

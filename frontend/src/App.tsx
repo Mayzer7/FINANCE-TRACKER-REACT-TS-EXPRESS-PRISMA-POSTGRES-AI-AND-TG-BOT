@@ -14,10 +14,16 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { TransactionsPage } from "@/pages/TransactionsPage";
 
 function AuthEntryRedirect() {
-  const { session } = useAuth();
+  const { session, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
   if (session) {
     return <Navigate to="/app/expenses" replace />;
   }
+
   return <Navigate to="/login" replace />;
 }
 

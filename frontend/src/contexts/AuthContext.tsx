@@ -1,35 +1,76 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { authApi } from "@/services/authApi";
+import { ApiError } from "@/services/api";
 import { authStorage } from "@/services/authStorage";
 import type { UserSession } from "@/types";
 import { AuthContext } from "./AuthContext.shared";
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<UserSession | null>(authStorage.getSession());
+function createSession(payload: { token: string; user: { sub: string; email: string } }): UserSession {
+  return {
+    userId: payload.user.sub,
+    email: payload.user.email,
+    token: payload.token,
+    loggedInAt: new Date().toISOString(),
+  };
+}
 
-  const login = (email: string, password: string) => {
-    const users = authStorage.getUsers();
-    const user = users.find((item) => item.email === email);
-    if (!user || user.password !== password) {
-      return { ok: false, error: "Неверный email или пароль" };
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [initialSession] = useState<UserSession | null>(() => authStorage.getSession());
+  const [session, setSession] = useState<UserSession | null>(initialSession);
+  const [isLoading, setIsLoading] = useState(Boolean(initialSession));
+
+  useEffect(() => {
+    if (!initialSession) {
+      return;
     }
 
-    const newSession: UserSession = { email, loggedInAt: new Date().toISOString() };
-    authStorage.saveSession(newSession);
-    setSession(newSession);
-    return { ok: true };
+    void (async () => {
+      try {
+        const { user } = await authApi.me(initialSession.token);
+        const nextSession: UserSession = {
+          ...initialSession,
+          userId: user.sub,
+          email: user.email,
+        };
+        authStorage.saveSession(nextSession);
+        setSession(nextSession);
+      } catch {
+        authStorage.clearSession();
+        setSession(null);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [initialSession]);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const result = await authApi.login(email, password);
+      const newSession = createSession(result);
+      authStorage.saveSession(newSession);
+      setSession(newSession);
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof ApiError ? error.message : "Не удалось выполнить вход",
+      };
+    }
   };
 
-  const register = (email: string, password: string) => {
-    const users = authStorage.getUsers();
-    if (users.some((item) => item.email === email)) {
-      return { ok: false, error: "Аккаунт с таким email уже существует" };
+  const register = async (email: string, password: string) => {
+    try {
+      const result = await authApi.register(email, password);
+      const newSession = createSession(result);
+      authStorage.saveSession(newSession);
+      setSession(newSession);
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof ApiError ? error.message : "Не удалось создать аккаунт",
+      };
     }
-
-    authStorage.saveUsers([...users, { email, password }]);
-    const newSession: UserSession = { email, loggedInAt: new Date().toISOString() };
-    authStorage.saveSession(newSession);
-    setSession(newSession);
-    return { ok: true };
   };
 
   const logout = () => {
@@ -38,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, login, register, logout }}>
+    <AuthContext.Provider value={{ session, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

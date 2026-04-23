@@ -31,11 +31,11 @@ export const authService = {
               { name: "Транспорт", color: "#D0AA63", type: "EXPENSE" },
               { name: "Зарплата", color: "#78C9A1", type: "INCOME" },
               { name: "Фриланс", color: "#67AEEA", type: "INCOME" },
-              { name: "Подарок", color: "#BBA7EA", type: "INCOME" }
-            ]
-          }
-        }
-      }
+              { name: "Подарок", color: "#BBA7EA", type: "INCOME" },
+            ],
+          },
+        },
+      },
     });
 
     const payload: JwtPayload = { sub: user.id, email: user.email };
@@ -55,5 +55,5 @@ export const authService = {
 
     const payload: JwtPayload = { sub: user.id, email: user.email };
     return { token: signToken(payload), user: payload };
-  }
+  },
 };

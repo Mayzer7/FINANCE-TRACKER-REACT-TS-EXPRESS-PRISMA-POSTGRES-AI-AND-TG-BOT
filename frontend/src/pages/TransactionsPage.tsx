@@ -3,7 +3,7 @@ import { useFinance } from "@/hooks/useFinance";
 import pageStyles from "./AppPage.module.css";
 
 export function TransactionsPage() {
-  const { transactions } = useFinance();
+  const { transactions, isLoading, error } = useFinance();
 
   return (
     <>
@@ -12,6 +12,10 @@ export function TransactionsPage() {
           Скачать
         </button>
       </div>
+
+      {error ? <p className="form-error">{error}</p> : null}
+      {isLoading ? <p>Загружаем данные...</p> : null}
+
       <TransactionList transactions={transactions} />
     </>
   );

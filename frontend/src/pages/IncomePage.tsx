@@ -6,7 +6,7 @@ import { useFinance } from "@/hooks/useFinance";
 import pageStyles from "./AppPage.module.css";
 
 export function IncomePage() {
-  const { transactions } = useFinance();
+  const { transactions, isLoading, error } = useFinance();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const incomeTransactions = transactions.filter((transaction) => transaction.type === "income");
@@ -21,6 +21,9 @@ export function IncomePage() {
           Добавить
         </button>
       </div>
+
+      {error ? <p className="form-error">{error}</p> : null}
+      {isLoading ? <p>Загружаем данные...</p> : null}
 
       <section className={pageStyles.contentGrid}>
         <DonutCard type="income" />

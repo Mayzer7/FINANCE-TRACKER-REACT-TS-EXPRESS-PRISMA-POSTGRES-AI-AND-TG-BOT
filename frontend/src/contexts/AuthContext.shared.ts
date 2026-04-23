@@ -1,10 +1,16 @@
 import { createContext } from "react";
 import type { UserSession } from "@/types";
 
+export type AuthActionResult = {
+  ok: boolean;
+  error?: string;
+};
+
 export type AuthContextValue = {
   session: UserSession | null;
-  login: (email: string, password: string) => { ok: boolean; error?: string };
-  register: (email: string, password: string) => { ok: boolean; error?: string };
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<AuthActionResult>;
+  register: (email: string, password: string) => Promise<AuthActionResult>;
   logout: () => void;
 };
 

@@ -26,12 +26,27 @@ export type Goal = {
   currentAmount: number;
 };
 
-export type UserRecord = {
+export type Summary = {
+  income: number;
+  expenses: number;
+  balance: number;
+};
+
+export type DashboardData = {
+  categories: Category[];
+  goals: Goal[];
+  transactions: Transaction[];
+  summary: Summary;
+};
+
+export type AuthUser = {
+  sub: string;
   email: string;
-  password: string;
 };
 
 export type UserSession = {
+  userId: string;
   email: string;
+  token: string;
   loggedInAt: string;
 };

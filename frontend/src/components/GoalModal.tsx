@@ -14,8 +14,9 @@ export function GoalModal({ onClose }: GoalModalProps) {
   const [currentAmount, setCurrentAmount] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!title.trim() || Number(targetAmount) <= 0 || Number(currentAmount) < 0) {
@@ -23,12 +24,23 @@ export function GoalModal({ onClose }: GoalModalProps) {
       return;
     }
 
-    addGoal({
+    setIsSubmitting(true);
+    setError("");
+
+    const result = await addGoal({
       title: title.trim(),
       description: description.trim() || "Новая финансовая цель",
       targetAmount: Number(targetAmount),
       currentAmount: Number(currentAmount || 0),
     });
+
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      setError(result.error ?? "Не удалось создать цель");
+      return;
+    }
+
     onClose();
   };
 
@@ -62,8 +74,8 @@ export function GoalModal({ onClose }: GoalModalProps) {
           <textarea value={description} onChange={(event) => setDescription(event.target.value)} />
         </label>
         {error ? <p className="form-error">{error}</p> : null}
-        <button className="button button-primary button-full" type="submit">
-          Создать
+        <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Сохраняем..." : "Создать"}
         </button>
       </form>
     </Modal>

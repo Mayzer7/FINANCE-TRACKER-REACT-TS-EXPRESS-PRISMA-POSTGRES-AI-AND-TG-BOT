@@ -8,28 +8,36 @@ type AuthPageProps = {
 };
 
 export function AuthPage({ mode }: AuthPageProps) {
-  const { login, register } = useAuth();
+  const { login, register, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isLogin = mode === "login";
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!email.includes("@")) {
       setError("Введите корректный email");
       return;
     }
+
     if (password.length < 6) {
       setError("Пароль должен быть не короче 6 символов");
       return;
     }
 
-    const result = isLogin ? login(email, password) : register(email, password);
+    setIsSubmitting(true);
+    setError("");
+
+    const result = isLogin ? await login(email, password) : await register(email, password);
+
+    setIsSubmitting(false);
+
     if (!result.ok) {
       setError(result.error ?? "Не удалось выполнить действие");
       return;
@@ -75,16 +83,14 @@ export function AuthPage({ mode }: AuthPageProps) {
             />
           </label>
           {error ? <p className="form-error">{error}</p> : null}
-          <button className="button button-primary button-full" type="submit">
-            {isLogin ? "Войти" : "Создать"}
+          <button className="button button-primary button-full" type="submit" disabled={isSubmitting || isLoading}>
+            {isSubmitting ? "Подождите..." : isLogin ? "Войти" : "Создать"}
           </button>
         </form>
 
         <p className={styles.footnote}>
           {isLogin ? "Нет аккаунта?" : "Уже есть аккаунт?"}{" "}
-          <Link to={isLogin ? "/register" : "/login"}>
-            {isLogin ? "Создать" : "Войти"}
-          </Link>
+          <Link to={isLogin ? "/register" : "/login"}>{isLogin ? "Создать" : "Войти"}</Link>
         </p>
       </div>
     </div>

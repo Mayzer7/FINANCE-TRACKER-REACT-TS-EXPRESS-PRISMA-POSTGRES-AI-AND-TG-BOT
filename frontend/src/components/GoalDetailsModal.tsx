@@ -21,6 +21,7 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
   const [amount, setAmount] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const progress = useMemo(
     () => Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)),
@@ -28,15 +29,26 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
   );
   const leftAmount = Math.max(goal.targetAmount - goal.currentAmount, 0);
 
-  const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleAdd = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (Number(amount) <= 0) {
       setError("Введите сумму пополнения");
       return;
     }
-    contributeToGoal(goal.id, Number(amount));
-    setAmount("");
+
+    setIsSubmitting(true);
     setError("");
+
+    const result = await contributeToGoal(goal.id, Number(amount));
+
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      setError(result.error ?? "Не удалось пополнить цель");
+      return;
+    }
+
+    setAmount("");
   };
 
   const handleAskAi = () => {
@@ -67,8 +79,8 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
             placeholder="Добавить к цели, ₽"
             inputMode="numeric"
           />
-          <button className="button button-primary" type="submit">
-            Добавить
+          <button className="button button-primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Сохраняем..." : "Добавить"}
           </button>
         </form>
         {error ? <p className="form-error">{error}</p> : null}

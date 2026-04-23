@@ -7,7 +7,7 @@ import { formatCurrency } from "@/utils/format";
 import pageStyles from "./AppPage.module.css";
 
 export function GoalsPage() {
-  const { goals } = useFinance();
+  const { goals, isLoading, error } = useFinance();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [activeGoal, setActiveGoal] = useState<Goal | null>(null);
 
@@ -21,6 +21,9 @@ export function GoalsPage() {
           Новая цель
         </button>
       </div>
+
+      {error ? <p className="form-error">{error}</p> : null}
+      {isLoading ? <p>Загружаем данные...</p> : null}
 
       <section className={pageStyles.goalGrid}>
         {goals.map((goal) => {
@@ -45,7 +48,11 @@ export function GoalsPage() {
               <p className={pageStyles.goalRest}>
                 Осталось накопить: {formatCurrency(goal.targetAmount - goal.currentAmount)}
               </p>
-              <button className={`text-button ${pageStyles.textButton}`} type="button" onClick={() => setActiveGoal(goal)}>
+              <button
+                className={`text-button ${pageStyles.textButton}`}
+                type="button"
+                onClick={() => setActiveGoal(goal)}
+              >
                 Открыть AI-чат
               </button>
             </article>
