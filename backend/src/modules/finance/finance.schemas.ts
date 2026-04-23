@@ -21,3 +21,11 @@ export const goalContributionSchema = z.object({
 export const balanceAdjustmentSchema = z.object({
   targetAmount: z.coerce.number()
 });
+
+export const categorySchema = z.object({
+  name: z.string().trim().min(1),
+  color: z.string().trim().regex(/^#([0-9a-fA-F]{6})$/),
+  type: z.enum(["EXPENSE", "INCOME"])
+});
+
+export const categoryUpdateSchema = categorySchema;

@@ -103,6 +103,58 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const createCategory: FinanceContextValue["createCategory"] = async (payload) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.createCategory(session.token, payload);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось создать категорию",
+      };
+    }
+  };
+
+  const updateCategory: FinanceContextValue["updateCategory"] = async (categoryId, payload) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.updateCategory(session.token, categoryId, payload);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error:
+          errorValue instanceof ApiError ? errorValue.message : "Не удалось обновить категорию",
+      };
+    }
+  };
+
+  const deleteCategory: FinanceContextValue["deleteCategory"] = async (categoryId) => {
+    if (!session?.token) {
+      return { ok: false, error: "Сессия не найдена" };
+    }
+
+    try {
+      await financeApi.deleteCategory(session.token, categoryId);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось удалить категорию",
+      };
+    }
+  };
+
   const setBalanceTarget: FinanceContextValue["setBalanceTarget"] = async (targetAmount) => {
     if (!session?.token) {
       return { ok: false, error: "Сессия не найдена" };
@@ -149,6 +201,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     refresh,
     addTransaction,
     addGoal,
+    createCategory,
+    updateCategory,
+    deleteCategory,
     setBalanceTarget,
     contributeToGoal,
     getSummary,

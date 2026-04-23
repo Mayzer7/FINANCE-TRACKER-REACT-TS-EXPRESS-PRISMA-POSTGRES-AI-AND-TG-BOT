@@ -9,6 +9,7 @@ const navItems = [
   { to: "/app/income", label: "Доходы", icon: "↗" },
   { to: "/app/transactions", label: "Все транзакции", icon: "⇄" },
   { to: "/app/goals", label: "Цели", icon: "◉" },
+  { to: "/app/categories", label: "Категории", icon: "◎" },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -16,6 +17,7 @@ const pageTitles: Record<string, string> = {
   "/app/income": "Доходы",
   "/app/transactions": "Все транзакции",
   "/app/goals": "Цели",
+  "/app/categories": "Категории",
   "/app/profile": "Профиль",
 };
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFinance } from "@/hooks/useFinance";
 import type { TransactionType } from "@/types";
+import { CategoryPicker } from "./CategoryPicker";
 import formStyles from "./FormShell.module.css";
 import { Modal } from "./Modal";
 
@@ -21,6 +22,12 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const scopedCategories = categories.filter((category) => category.type === type);
+
+  const switchType = (nextType: TransactionType) => {
+    setType(nextType);
+    setCategoryId(categories.find((item) => item.type === nextType)?.id ?? "");
+    setError("");
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,10 +68,7 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
                 : formStyles.pillItem
             }
             type="button"
-            onClick={() => {
-              setType("expense");
-              setCategoryId(categories.find((item) => item.type === "expense")?.id ?? "");
-            }}
+            onClick={() => switchType("expense")}
           >
             Расход
           </button>
@@ -75,10 +79,7 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
                 : formStyles.pillItem
             }
             type="button"
-            onClick={() => {
-              setType("income");
-              setCategoryId(categories.find((item) => item.type === "income")?.id ?? "");
-            }}
+            onClick={() => switchType("income")}
           >
             Доход
           </button>
@@ -97,16 +98,19 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
         </label>
         <label>
           Категория
-          <select value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-            {scopedCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+          <CategoryPicker
+            categories={scopedCategories}
+            value={categoryId}
+            onChange={setCategoryId}
+            placeholder="Выберите категорию"
+          />
         </label>
         {error ? <p className="form-error">{error}</p> : null}
-        <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
+        <button
+          className="button button-primary button-full"
+          type="submit"
+          disabled={isSubmitting || !scopedCategories.length}
+        >
           {isSubmitting ? "Сохраняем..." : "Добавить"}
         </button>
       </form>

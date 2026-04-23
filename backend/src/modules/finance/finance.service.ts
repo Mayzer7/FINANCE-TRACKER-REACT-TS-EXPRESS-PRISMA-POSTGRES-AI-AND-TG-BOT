@@ -54,6 +54,98 @@ export const financeService = {
     };
   },
 
+  async createCategory(
+    userId: string,
+    payload: { name: string; color: string; type: "EXPENSE" | "INCOME" }
+  ) {
+    try {
+      const category = await prisma.category.create({
+        data: {
+          userId,
+          name: payload.name,
+          color: payload.color,
+          type: payload.type,
+        },
+      });
+
+      return serializeCategory(category);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        throw new HttpError(409, "Категория с таким названием уже существует");
+      }
+      throw error;
+    }
+  },
+
+  async updateCategory(
+    userId: string,
+    categoryId: string,
+    payload: { name: string; color: string; type: "EXPENSE" | "INCOME" }
+  ) {
+    const existingCategory = await prisma.category.findFirst({
+      where: { id: categoryId, userId },
+      include: {
+        transactions: {
+          select: { id: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!existingCategory) {
+      throw new HttpError(404, "Категория не найдена");
+    }
+
+    if (
+      existingCategory.type !== payload.type &&
+      existingCategory.transactions.length > 0
+    ) {
+      throw new HttpError(409, "Нельзя менять тип категории, в которой уже есть операции");
+    }
+
+    try {
+      const category = await prisma.category.update({
+        where: { id: categoryId },
+        data: {
+          name: payload.name,
+          color: payload.color,
+          type: payload.type,
+        },
+      });
+
+      return serializeCategory(category);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        throw new HttpError(409, "Категория с таким названием уже существует");
+      }
+      throw error;
+    }
+  },
+
+  async deleteCategory(userId: string, categoryId: string) {
+    const existingCategory = await prisma.category.findFirst({
+      where: { id: categoryId, userId },
+      include: {
+        transactions: {
+          select: { id: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!existingCategory) {
+      throw new HttpError(404, "Категория не найдена");
+    }
+
+    if (existingCategory.transactions.length > 0) {
+      throw new HttpError(409, "Нельзя удалить категорию, в которой уже есть операции");
+    }
+
+    await prisma.category.delete({
+      where: { id: categoryId },
+    });
+  },
+
   async createTransaction(
     userId: string,
     payload: { title: string; amount: number; type: "EXPENSE" | "INCOME"; categoryId: string }
@@ -108,10 +200,13 @@ export const financeService = {
       }),
     ]);
 
-    const transactionBalance = transactions.reduce((acc: number, transaction: { amount: Prisma.Decimal; type: "INCOME" | "EXPENSE" }) => {
-      const amount = Number(transaction.amount);
-      return transaction.type === "INCOME" ? acc + amount : acc - amount;
-    }, 0);
+    const transactionBalance = transactions.reduce(
+      (acc: number, transaction: { amount: Prisma.Decimal; type: "INCOME" | "EXPENSE" }) => {
+        const amount = Number(transaction.amount);
+        return transaction.type === "INCOME" ? acc + amount : acc - amount;
+      },
+      0
+    );
 
     const adjustmentBalance = adjustments.reduce(
       (acc: number, adjustment: { amount: Prisma.Decimal }) => acc + Number(adjustment.amount),

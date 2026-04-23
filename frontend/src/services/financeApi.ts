@@ -1,4 +1,4 @@
-import type { BalanceTargetResult, DashboardData, Goal, Transaction, TransactionType } from "@/types";
+import type { BalanceTargetResult, Category, DashboardData, Goal, Transaction, TransactionType } from "@/types";
 import { apiRequest } from "./api";
 
 export const financeApi = {
@@ -36,6 +36,39 @@ export const financeApi = {
       method: "POST",
       token,
       body: JSON.stringify({ targetAmount }),
+    });
+  },
+  createCategory(
+    token: string,
+    payload: { name: string; color: string; type: TransactionType }
+  ) {
+    return apiRequest<Category>("/finance/categories", {
+      method: "POST",
+      token,
+      body: JSON.stringify({
+        ...payload,
+        type: payload.type.toUpperCase(),
+      }),
+    });
+  },
+  updateCategory(
+    token: string,
+    categoryId: string,
+    payload: { name: string; color: string; type: TransactionType }
+  ) {
+    return apiRequest<Category>(`/finance/categories/${categoryId}`, {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({
+        ...payload,
+        type: payload.type.toUpperCase(),
+      }),
+    });
+  },
+  deleteCategory(token: string, categoryId: string) {
+    return apiRequest<void>(`/finance/categories/${categoryId}`, {
+      method: "DELETE",
+      token,
     });
   },
   contributeToGoal(token: string, goalId: string, amount: number) {

@@ -7,6 +7,9 @@ export const financeRouter = Router();
 
 financeRouter.use(requireAuth);
 financeRouter.get("/dashboard", asyncHandler(financeController.getDashboard));
+financeRouter.post("/categories", asyncHandler(financeController.createCategory));
+financeRouter.patch("/categories/:categoryId", asyncHandler(financeController.updateCategory));
+financeRouter.delete("/categories/:categoryId", asyncHandler(financeController.deleteCategory));
 financeRouter.post("/transactions", asyncHandler(financeController.createTransaction));
 financeRouter.post("/goals", asyncHandler(financeController.createGoal));
 financeRouter.post("/balance-adjustments", asyncHandler(financeController.setBalanceTarget));
