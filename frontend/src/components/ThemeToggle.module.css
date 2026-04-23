@@ -18,14 +18,16 @@
   box-shadow: var(--shadow);
   backdrop-filter: blur(14px);
   transition:
-    transform var(--transition-base),
     border-color var(--transition-base),
-    background var(--transition-base);
+    background var(--transition-base),
+    color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .toggle:hover .track {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--brand) 32%, var(--panel-border));
+  background: var(--interactive-hover-bg);
+  border-color: var(--interactive-hover-border);
+  box-shadow: 0 14px 28px rgba(130, 190, 147, 0.12);
 }
 
 .toggle:focus-visible .track {
@@ -40,6 +42,11 @@
   width: 1.2rem;
   height: 1.2rem;
   color: var(--text);
+  transition: color var(--transition-base);
+}
+
+.toggle:hover .icon {
+  color: var(--interactive-hover-text);
 }
 
 .icon svg {

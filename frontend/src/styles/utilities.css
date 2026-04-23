@@ -14,21 +14,20 @@
   padding: 0 1.35rem;
   border-radius: 999px;
   transition:
-    transform var(--transition-base),
     background var(--transition-base),
     border-color var(--transition-base),
-    color var(--transition-base);
-}
-
-.button:hover,
-.link-button:hover,
-.text-button:hover {
-  transform: translateY(-1px);
+    color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .button-primary {
   background: var(--brand);
   color: #102114;
+}
+
+.button-primary:hover {
+  background: color-mix(in srgb, var(--brand) 86%, white);
+  box-shadow: 0 14px 28px rgba(130, 190, 147, 0.16);
 }
 
 .button-secondary {
@@ -37,11 +36,24 @@
   color: var(--text);
 }
 
+.button-secondary:hover {
+  background: var(--interactive-hover-bg);
+  border-color: var(--interactive-hover-border);
+  color: var(--interactive-hover-text);
+}
+
 .button-ghost,
 .link-button,
 .text-button {
   background: transparent;
   color: var(--text);
+}
+
+.button-ghost:hover,
+.link-button:hover,
+.text-button:hover {
+  background: var(--interactive-hover-bg);
+  color: var(--interactive-hover-text);
 }
 
 .button-full {

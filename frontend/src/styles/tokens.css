@@ -14,6 +14,9 @@
   --text-muted: #9da39e;
   --brand: #82be93;
   --brand-deep: #688d73;
+  --interactive-hover-bg: rgba(130, 190, 147, 0.12);
+  --interactive-hover-border: rgba(130, 190, 147, 0.3);
+  --interactive-hover-text: #a7dbb6;
   --positive: #7fd0a3;
   --negative: #d9a489;
   --danger: #e59a84;
@@ -38,6 +41,9 @@
   --text-muted: #6d726b;
   --brand: #7ea889;
   --brand-deep: #6b9173;
+  --interactive-hover-bg: rgba(126, 168, 137, 0.14);
+  --interactive-hover-border: rgba(107, 145, 115, 0.28);
+  --interactive-hover-text: #567860;
   --positive: #5ca66e;
   --negative: #b8866b;
   --danger: #cb7f6c;

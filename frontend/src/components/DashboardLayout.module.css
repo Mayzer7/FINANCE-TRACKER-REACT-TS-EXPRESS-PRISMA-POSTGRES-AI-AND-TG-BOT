@@ -39,11 +39,16 @@
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
-  transition: transform var(--transition-base), background var(--transition-base);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .navItem:hover {
-  transform: translateY(-1px);
+  background: var(--interactive-hover-bg);
+  color: var(--interactive-hover-text);
 }
 
 .navItemActive {

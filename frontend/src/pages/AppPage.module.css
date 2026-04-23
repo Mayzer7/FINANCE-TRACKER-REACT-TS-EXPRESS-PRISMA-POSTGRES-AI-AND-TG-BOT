@@ -82,10 +82,13 @@
 .textButton {
   padding: 0;
   color: var(--brand);
+  transition:
+    color var(--transition-base),
+    background var(--transition-base);
 }
 
 .textButton:hover {
-  transform: translateY(-1px);
+  color: var(--interactive-hover-text);
 }
 
 @media (max-width: 980px) {
