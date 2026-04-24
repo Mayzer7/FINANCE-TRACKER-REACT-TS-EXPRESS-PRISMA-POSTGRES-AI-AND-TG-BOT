@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { DashboardData } from "@/types";
+import type { DashboardData, GoalChatMessage } from "@/types";
 
 export type FinanceContextValue = DashboardData & {
   isLoading: boolean;
@@ -17,6 +17,17 @@ export type FinanceContextValue = DashboardData & {
     targetAmount: number;
     currentAmount: number;
   }) => Promise<{ ok: boolean; error?: string }>;
+  deleteGoal: (goalId: string) => Promise<{ ok: boolean; error?: string }>;
+  getGoalChat: (goalId: string) => Promise<{
+    ok: boolean;
+    messages?: GoalChatMessage[];
+    error?: string;
+  }>;
+  sendGoalChatMessage: (goalId: string, content: string) => Promise<{
+    ok: boolean;
+    messages?: GoalChatMessage[];
+    error?: string;
+  }>;
   createCategory: (payload: {
     name: string;
     color: string;

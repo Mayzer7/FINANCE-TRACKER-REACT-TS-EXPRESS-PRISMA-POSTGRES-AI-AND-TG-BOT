@@ -2,14 +2,15 @@ import { useState } from "react";
 import { GoalDetailsModal } from "@/components/GoalDetailsModal";
 import { GoalModal } from "@/components/GoalModal";
 import { useFinance } from "@/hooks/useFinance";
-import type { Goal } from "@/types";
 import { formatCurrency } from "@/utils/format";
 import pageStyles from "./AppPage.module.css";
 
 export function GoalsPage() {
   const { goals, isLoading, error } = useFinance();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [activeGoal, setActiveGoal] = useState<Goal | null>(null);
+  const [activeGoalId, setActiveGoalId] = useState<string | null>(null);
+
+  const activeGoal = goals.find((goal) => goal.id === activeGoalId) ?? null;
 
   return (
     <>
@@ -33,7 +34,19 @@ export function GoalsPage() {
           const progress = Math.round((goal.currentAmount / goal.targetAmount) * 100);
 
           return (
-            <article className={`${pageStyles.goalCard} surface`} key={goal.id}>
+            <article
+              className={`${pageStyles.goalCard} ${pageStyles.goalCardInteractive} surface`}
+              key={goal.id}
+              onClick={() => setActiveGoalId(goal.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveGoalId(goal.id);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+            >
               <div className={pageStyles.goalTop}>
                 <div>
                   <h3>{goal.title}</h3>
@@ -41,6 +54,7 @@ export function GoalsPage() {
                 </div>
                 <span className={pageStyles.goalBadge}>{progress}%</span>
               </div>
+
               <div className={pageStyles.goalProgress}>
                 <span style={{ width: `${Math.min(progress, 100)}%` }} />
               </div>
@@ -51,22 +65,14 @@ export function GoalsPage() {
               <p className={pageStyles.goalRest}>
                 Осталось накопить: {formatCurrency(goal.targetAmount - goal.currentAmount)}
               </p>
-              <button
-                className={`text-button ${pageStyles.textButton}`}
-                type="button"
-                onClick={() => setActiveGoal(goal)}
-              >
-                Открыть AI-чат
-              </button>
+              <span className={pageStyles.goalOpenHint}>Открыть цель и AI-чат</span>
             </article>
           );
         })}
       </section>
 
       {isCreateOpen ? <GoalModal onClose={() => setIsCreateOpen(false)} /> : null}
-      {activeGoal ? (
-        <GoalDetailsModal goal={activeGoal} onClose={() => setActiveGoal(null)} />
-      ) : null}
+      {activeGoal ? <GoalDetailsModal goal={activeGoal} onClose={() => setActiveGoalId(null)} /> : null}
     </>
   );
 }

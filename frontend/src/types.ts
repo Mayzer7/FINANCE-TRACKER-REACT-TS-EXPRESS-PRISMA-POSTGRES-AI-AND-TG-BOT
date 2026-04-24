@@ -26,6 +26,14 @@ export type Goal = {
   currentAmount: number;
 };
 
+export type GoalChatMessage = {
+  id: string;
+  goalId: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+};
+
 export type Summary = {
   income: number;
   expenses: number;

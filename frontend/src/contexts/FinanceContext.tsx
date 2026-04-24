@@ -5,6 +5,21 @@ import { financeApi } from "@/services/financeApi";
 import type { DashboardData } from "@/types";
 import { emptyDashboard, FinanceContext, type FinanceContextValue } from "./FinanceContext.shared";
 
+const FALLBACK_MESSAGES = {
+  load: "Не удалось загрузить данные",
+  session: "Сессия не найдена",
+  transaction: "Не удалось добавить операцию",
+  goal: "Не удалось создать цель",
+  goalDelete: "Не удалось удалить цель",
+  goalChatLoad: "Не удалось загрузить историю чата",
+  goalChatSend: "Не удалось получить ответ AI",
+  categoryCreate: "Не удалось создать категорию",
+  categoryUpdate: "Не удалось обновить категорию",
+  categoryDelete: "Не удалось удалить категорию",
+  balance: "Не удалось обновить текущий баланс",
+  contribution: "Не удалось пополнить цель",
+};
+
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const { session, logout, isLoading: isAuthLoading } = useAuth();
   const [state, setState] = useState<DashboardData>(emptyDashboard);
@@ -26,8 +41,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       const dashboard = await financeApi.getDashboard(session.token);
       setState(dashboard);
     } catch (errorValue) {
-      const message =
-        errorValue instanceof ApiError ? errorValue.message : "Не удалось загрузить данные";
+      const message = errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.load;
       setError(message);
       if (errorValue instanceof ApiError && errorValue.status === 401) {
         logout();
@@ -57,8 +71,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         const dashboard = await financeApi.getDashboard(session.token);
         setState(dashboard);
       } catch (errorValue) {
-        const message =
-          errorValue instanceof ApiError ? errorValue.message : "Не удалось загрузить данные";
+        const message = errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.load;
         setError(message);
         if (errorValue instanceof ApiError && errorValue.status === 401) {
           logout();
@@ -71,7 +84,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const addTransaction: FinanceContextValue["addTransaction"] = async (payload) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -81,14 +94,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось добавить операцию",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.transaction,
       };
     }
   };
 
   const addGoal: FinanceContextValue["addGoal"] = async (payload) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -98,14 +111,66 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось создать цель",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.goal,
+      };
+    }
+  };
+
+  const deleteGoal: FinanceContextValue["deleteGoal"] = async (goalId) => {
+    if (!session?.token) {
+      return { ok: false, error: FALLBACK_MESSAGES.session };
+    }
+
+    try {
+      await financeApi.deleteGoal(session.token, goalId);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.goalDelete,
+      };
+    }
+  };
+
+  const getGoalChat: FinanceContextValue["getGoalChat"] = async (goalId) => {
+    if (!session?.token) {
+      return { ok: false, error: FALLBACK_MESSAGES.session };
+    }
+
+    try {
+      const result = await financeApi.getGoalChat(session.token, goalId);
+      return { ok: true, messages: result.messages };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.goalChatLoad,
+      };
+    }
+  };
+
+  const sendGoalChatMessage: FinanceContextValue["sendGoalChatMessage"] = async (goalId, content) => {
+    if (!session?.token) {
+      return { ok: false, error: FALLBACK_MESSAGES.session };
+    }
+
+    try {
+      const result = await financeApi.sendGoalChatMessage(session.token, goalId, content);
+      return {
+        ok: true,
+        messages: [result.userMessage, result.assistantMessage],
+      };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.goalChatSend,
       };
     }
   };
 
   const createCategory: FinanceContextValue["createCategory"] = async (payload) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -115,14 +180,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось создать категорию",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.categoryCreate,
       };
     }
   };
 
   const updateCategory: FinanceContextValue["updateCategory"] = async (categoryId, payload) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -132,15 +197,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error:
-          errorValue instanceof ApiError ? errorValue.message : "Не удалось обновить категорию",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.categoryUpdate,
       };
     }
   };
 
   const deleteCategory: FinanceContextValue["deleteCategory"] = async (categoryId) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -150,14 +214,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось удалить категорию",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.categoryDelete,
       };
     }
   };
 
   const setBalanceTarget: FinanceContextValue["setBalanceTarget"] = async (targetAmount) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -167,17 +231,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error:
-          errorValue instanceof ApiError
-            ? errorValue.message
-            : "Не удалось обновить текущий баланс",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.balance,
       };
     }
   };
 
   const contributeToGoal: FinanceContextValue["contributeToGoal"] = async (goalId, amount) => {
     if (!session?.token) {
-      return { ok: false, error: "Сессия не найдена" };
+      return { ok: false, error: FALLBACK_MESSAGES.session };
     }
 
     try {
@@ -187,7 +248,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     } catch (errorValue) {
       return {
         ok: false,
-        error: errorValue instanceof ApiError ? errorValue.message : "Не удалось пополнить цель",
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.contribution,
       };
     }
   };
@@ -201,6 +262,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     refresh,
     addTransaction,
     addGoal,
+    deleteGoal,
+    getGoalChat,
+    sendGoalChatMessage,
     createCategory,
     updateCategory,
     deleteCategory,

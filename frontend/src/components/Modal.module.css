@@ -23,6 +23,12 @@
   gap: 1rem;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .header h3 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3rem);

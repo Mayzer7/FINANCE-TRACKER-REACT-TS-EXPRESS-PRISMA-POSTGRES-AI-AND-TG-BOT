@@ -36,6 +36,21 @@
   border-radius: 1.8rem;
 }
 
+.goalCardInteractive {
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.goalCardInteractive:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+  box-shadow: 0 24px 45px rgba(6, 15, 11, 0.24);
+}
+
 .goalTop {
   display: flex;
   justify-content: space-between;
@@ -91,6 +106,13 @@
 
 .goalRest {
   margin-bottom: 0;
+}
+
+.goalOpenHint {
+  display: inline-flex;
+  margin-top: 0.9rem;
+  color: var(--brand);
+  font-size: 0.95rem;
 }
 
 .textButton {

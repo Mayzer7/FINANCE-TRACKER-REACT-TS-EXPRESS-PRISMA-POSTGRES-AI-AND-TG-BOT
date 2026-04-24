@@ -1,7 +1,54 @@
-import { Prisma, type BalanceAdjustment, type Transaction } from "@prisma/client";
+import { Prisma, type BalanceAdjustment, type GoalChatMessage, type Transaction } from "@prisma/client";
 import { HttpError } from "../../lib/http-error.js";
 import { prisma } from "../../lib/prisma.js";
-import { serializeCategory, serializeGoal, serializeTransaction } from "./finance.serializer.js";
+import { generateGoalAssistantReply } from "./finance.ai.js";
+import {
+  serializeCategory,
+  serializeGoal,
+  serializeGoalChatMessage,
+  serializeTransaction,
+} from "./finance.serializer.js";
+
+const RECENT_TRANSACTIONS_LIMIT = 30;
+const CHAT_HISTORY_LIMIT = 16;
+
+function buildSummary(
+  transactions: Array<Transaction & { amount: Prisma.Decimal }>,
+  adjustments: Array<BalanceAdjustment & { amount: Prisma.Decimal }>
+) {
+  const summaryBase = transactions.reduce(
+    (acc: { income: number; expenses: number; balance: number }, transaction) => {
+      const amount = Number(transaction.amount);
+      if (transaction.type === "INCOME") {
+        acc.income += amount;
+      } else {
+        acc.expenses += amount;
+      }
+      acc.balance = acc.income - acc.expenses;
+      return acc;
+    },
+    { income: 0, expenses: 0, balance: 0 }
+  );
+
+  const adjustmentTotal = adjustments.reduce((acc, adjustment) => acc + Number(adjustment.amount), 0);
+
+  return {
+    ...summaryBase,
+    balance: summaryBase.balance + adjustmentTotal,
+  };
+}
+
+async function getGoalOrThrow(userId: string, goalId: string) {
+  const goal = await prisma.goal.findFirst({
+    where: { id: goalId, userId },
+  });
+
+  if (!goal) {
+    throw new HttpError(404, "Цель не найдена");
+  }
+
+  return goal;
+}
 
 export const financeService = {
   async getDashboard(userId: string) {
@@ -24,30 +71,8 @@ export const financeService = {
       }),
     ]);
 
-    const summaryBase = transactions.reduce(
-      (acc: { income: number; expenses: number; balance: number }, transaction: Transaction) => {
-        const amount = Number(transaction.amount);
-        if (transaction.type === "INCOME") {
-          acc.income += amount;
-        } else {
-          acc.expenses += amount;
-        }
-        acc.balance = acc.income - acc.expenses;
-        return acc;
-      },
-      { income: 0, expenses: 0, balance: 0 }
-    );
-
-    const adjustmentTotal = adjustments.reduce(
-      (acc: number, adjustment: BalanceAdjustment) => acc + Number(adjustment.amount),
-      0
-    );
-
     return {
-      summary: {
-        ...summaryBase,
-        balance: summaryBase.balance + adjustmentTotal,
-      },
+      summary: buildSummary(transactions, adjustments),
       categories: categories.map(serializeCategory),
       transactions: transactions.map(serializeTransaction),
       goals: goals.map(serializeGoal),
@@ -96,10 +121,7 @@ export const financeService = {
       throw new HttpError(404, "Категория не найдена");
     }
 
-    if (
-      existingCategory.type !== payload.type &&
-      existingCategory.transactions.length > 0
-    ) {
+    if (existingCategory.type !== payload.type && existingCategory.transactions.length > 0) {
       throw new HttpError(409, "Нельзя менять тип категории, в которой уже есть операции");
     }
 
@@ -188,6 +210,14 @@ export const financeService = {
     return serializeGoal(goal);
   },
 
+  async deleteGoal(userId: string, goalId: string) {
+    await getGoalOrThrow(userId, goalId);
+
+    await prisma.goal.delete({
+      where: { id: goalId },
+    });
+  },
+
   async setBalanceTarget(userId: string, targetAmount: number) {
     const [transactions, adjustments] = await Promise.all([
       prisma.transaction.findMany({
@@ -200,19 +230,12 @@ export const financeService = {
       }),
     ]);
 
-    const transactionBalance = transactions.reduce(
-      (acc: number, transaction: { amount: Prisma.Decimal; type: "INCOME" | "EXPENSE" }) => {
-        const amount = Number(transaction.amount);
-        return transaction.type === "INCOME" ? acc + amount : acc - amount;
-      },
-      0
-    );
+    const transactionBalance = transactions.reduce((acc, transaction) => {
+      const amount = Number(transaction.amount);
+      return transaction.type === "INCOME" ? acc + amount : acc - amount;
+    }, 0);
 
-    const adjustmentBalance = adjustments.reduce(
-      (acc: number, adjustment: { amount: Prisma.Decimal }) => acc + Number(adjustment.amount),
-      0
-    );
-
+    const adjustmentBalance = adjustments.reduce((acc, adjustment) => acc + Number(adjustment.amount), 0);
     const currentBalance = transactionBalance + adjustmentBalance;
     const delta = targetAmount - currentBalance;
 
@@ -231,10 +254,7 @@ export const financeService = {
   },
 
   async contributeToGoal(userId: string, goalId: string, amount: number) {
-    const existingGoal = await prisma.goal.findFirst({ where: { id: goalId, userId } });
-    if (!existingGoal) {
-      throw new HttpError(404, "Цель не найдена");
-    }
+    const existingGoal = await getGoalOrThrow(userId, goalId);
 
     const nextCurrentAmount = Math.min(
       Number(existingGoal.targetAmount),
@@ -249,5 +269,116 @@ export const financeService = {
     });
 
     return serializeGoal(goal);
+  },
+
+  async getGoalChat(userId: string, goalId: string) {
+    await getGoalOrThrow(userId, goalId);
+
+    const messages = await prisma.goalChatMessage.findMany({
+      where: { userId, goalId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return {
+      messages: messages.map(serializeGoalChatMessage),
+    };
+  },
+
+  async sendGoalChatMessage(userId: string, goalId: string, content: string) {
+    const [goal, user, categories, goals, transactions, adjustments, history] = await Promise.all([
+      getGoalOrThrow(userId, goalId),
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true },
+      }),
+      prisma.category.findMany({
+        where: { userId },
+        orderBy: [{ type: "asc" }, { name: "asc" }],
+      }),
+      prisma.goal.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.transaction.findMany({
+        where: { userId },
+        include: {
+          category: {
+            select: { name: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: RECENT_TRANSACTIONS_LIMIT,
+      }),
+      prisma.balanceAdjustment.findMany({
+        where: { userId },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.goalChatMessage.findMany({
+        where: { userId, goalId },
+        orderBy: { createdAt: "asc" },
+        take: CHAT_HISTORY_LIMIT,
+      }),
+    ]);
+
+    const summary = buildSummary(transactions, adjustments);
+    const assistantReply = await generateGoalAssistantReply({
+      userEmail: user?.email ?? "unknown",
+      currentGoal: {
+        title: goal.title,
+        description: goal.description,
+        currentAmount: Number(goal.currentAmount),
+        targetAmount: Number(goal.targetAmount),
+      },
+      summary,
+      categories: categories.map((category) => ({
+        name: category.name,
+        color: category.color,
+        type: category.type === "INCOME" ? "income" : "expense",
+      })),
+      goals: goals.map((currentGoal) => ({
+        title: currentGoal.title,
+        currentAmount: Number(currentGoal.currentAmount),
+        targetAmount: Number(currentGoal.targetAmount),
+      })),
+      transactions: transactions.map((transaction) => ({
+        title: transaction.title,
+        amount: Number(transaction.amount),
+        type: transaction.type === "INCOME" ? "income" : "expense",
+        category: transaction.category.name,
+        createdAt: transaction.createdAt.toISOString(),
+      })),
+      history: history.map((message: GoalChatMessage) => ({
+        role: message.role === "ASSISTANT" ? "assistant" : "user",
+        content: message.content,
+      })),
+      userMessage: content,
+    });
+
+    const result = await prisma.$transaction(async (tx) => {
+      const userMessage = await tx.goalChatMessage.create({
+        data: {
+          userId,
+          goalId,
+          role: "USER",
+          content,
+        },
+      });
+
+      const assistantMessage = await tx.goalChatMessage.create({
+        data: {
+          userId,
+          goalId,
+          role: "ASSISTANT",
+          content: assistantReply,
+        },
+      });
+
+      return { userMessage, assistantMessage };
+    });
+
+    return {
+      userMessage: serializeGoalChatMessage(result.userMessage),
+      assistantMessage: serializeGoalChatMessage(result.assistantMessage),
+    };
   },
 };

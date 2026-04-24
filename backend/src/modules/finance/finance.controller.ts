@@ -4,10 +4,15 @@ import {
   balanceAdjustmentSchema,
   categorySchema,
   categoryUpdateSchema,
+  goalChatMessageSchema,
   goalContributionSchema,
   goalSchema,
   transactionSchema,
 } from "./finance.schemas.js";
+
+function getRouteParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value ?? "";
+}
 
 export const financeController = {
   async getDashboard(request: Request, response: Response) {
@@ -27,6 +32,25 @@ export const financeController = {
     return response.status(201).json(result);
   },
 
+  async deleteGoal(request: Request, response: Response) {
+    const goalId = getRouteParam(request.params.goalId);
+    await financeService.deleteGoal(request.user!.sub, goalId);
+    return response.status(204).send();
+  },
+
+  async getGoalChat(request: Request, response: Response) {
+    const goalId = getRouteParam(request.params.goalId);
+    const result = await financeService.getGoalChat(request.user!.sub, goalId);
+    return response.status(200).json(result);
+  },
+
+  async sendGoalChatMessage(request: Request, response: Response) {
+    const goalId = getRouteParam(request.params.goalId);
+    const payload = goalChatMessageSchema.parse(request.body);
+    const result = await financeService.sendGoalChatMessage(request.user!.sub, goalId, payload.content);
+    return response.status(201).json(result);
+  },
+
   async createCategory(request: Request, response: Response) {
     const payload = categorySchema.parse(request.body);
     const result = await financeService.createCategory(request.user!.sub, payload);
@@ -35,17 +59,13 @@ export const financeController = {
 
   async updateCategory(request: Request, response: Response) {
     const payload = categoryUpdateSchema.parse(request.body);
-    const categoryId = Array.isArray(request.params.categoryId)
-      ? request.params.categoryId[0]
-      : request.params.categoryId;
+    const categoryId = getRouteParam(request.params.categoryId);
     const result = await financeService.updateCategory(request.user!.sub, categoryId, payload);
     return response.status(200).json(result);
   },
 
   async deleteCategory(request: Request, response: Response) {
-    const categoryId = Array.isArray(request.params.categoryId)
-      ? request.params.categoryId[0]
-      : request.params.categoryId;
+    const categoryId = getRouteParam(request.params.categoryId);
     await financeService.deleteCategory(request.user!.sub, categoryId);
     return response.status(204).send();
   },
@@ -58,14 +78,8 @@ export const financeController = {
 
   async contributeToGoal(request: Request, response: Response) {
     const payload = goalContributionSchema.parse(request.body);
-    const goalId = Array.isArray(request.params.goalId)
-      ? request.params.goalId[0]
-      : request.params.goalId;
-    const result = await financeService.contributeToGoal(
-      request.user!.sub,
-      goalId,
-      payload.amount
-    );
+    const goalId = getRouteParam(request.params.goalId);
+    const result = await financeService.contributeToGoal(request.user!.sub, goalId, payload.amount);
     return response.status(200).json(result);
   },
 };

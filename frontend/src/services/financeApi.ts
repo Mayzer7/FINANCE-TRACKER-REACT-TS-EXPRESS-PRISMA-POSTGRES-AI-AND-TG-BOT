@@ -1,4 +1,12 @@
-import type { BalanceTargetResult, Category, DashboardData, Goal, Transaction, TransactionType } from "@/types";
+import type {
+  BalanceTargetResult,
+  Category,
+  DashboardData,
+  Goal,
+  GoalChatMessage,
+  Transaction,
+  TransactionType,
+} from "@/types";
 import { apiRequest } from "./api";
 
 export const financeApi = {
@@ -8,6 +16,7 @@ export const financeApi = {
       token,
     });
   },
+
   createTransaction(
     token: string,
     payload: { title: string; amount: number; categoryId: string; type: TransactionType }
@@ -21,6 +30,7 @@ export const financeApi = {
       }),
     });
   },
+
   createGoal(
     token: string,
     payload: { title: string; description: string; targetAmount: number; currentAmount: number }
@@ -31,6 +41,32 @@ export const financeApi = {
       body: JSON.stringify(payload),
     });
   },
+
+  deleteGoal(token: string, goalId: string) {
+    return apiRequest<void>(`/finance/goals/${goalId}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+
+  getGoalChat(token: string, goalId: string) {
+    return apiRequest<{ messages: GoalChatMessage[] }>(`/finance/goals/${goalId}/chat`, {
+      method: "GET",
+      token,
+    });
+  },
+
+  sendGoalChatMessage(token: string, goalId: string, content: string) {
+    return apiRequest<{ userMessage: GoalChatMessage; assistantMessage: GoalChatMessage }>(
+      `/finance/goals/${goalId}/chat`,
+      {
+        method: "POST",
+        token,
+        body: JSON.stringify({ content }),
+      }
+    );
+  },
+
   setBalanceTarget(token: string, targetAmount: number) {
     return apiRequest<BalanceTargetResult>("/finance/balance-adjustments", {
       method: "POST",
@@ -38,10 +74,8 @@ export const financeApi = {
       body: JSON.stringify({ targetAmount }),
     });
   },
-  createCategory(
-    token: string,
-    payload: { name: string; color: string; type: TransactionType }
-  ) {
+
+  createCategory(token: string, payload: { name: string; color: string; type: TransactionType }) {
     return apiRequest<Category>("/finance/categories", {
       method: "POST",
       token,
@@ -51,6 +85,7 @@ export const financeApi = {
       }),
     });
   },
+
   updateCategory(
     token: string,
     categoryId: string,
@@ -65,12 +100,14 @@ export const financeApi = {
       }),
     });
   },
+
   deleteCategory(token: string, categoryId: string) {
     return apiRequest<void>(`/finance/categories/${categoryId}`, {
       method: "DELETE",
       token,
     });
   },
+
   contributeToGoal(token: string, goalId: string, amount: number) {
     return apiRequest<Goal>(`/finance/goals/${goalId}/contributions`, {
       method: "POST",

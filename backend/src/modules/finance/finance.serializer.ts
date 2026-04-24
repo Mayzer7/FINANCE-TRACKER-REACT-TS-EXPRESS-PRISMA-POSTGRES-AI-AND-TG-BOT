@@ -1,4 +1,11 @@
-import type { Category, Goal, Prisma, Transaction, TransactionType } from "@prisma/client";
+import type {
+  Category,
+  Goal,
+  GoalChatMessage,
+  Prisma,
+  Transaction,
+  TransactionType,
+} from "@prisma/client";
 
 function serializeTransactionType(type: TransactionType): "expense" | "income" {
   return type === "INCOME" ? "income" : "expense";
@@ -13,9 +20,7 @@ export function serializeCategory(category: Category) {
   };
 }
 
-export function serializeTransaction(
-  transaction: Transaction & { amount: Prisma.Decimal }
-) {
+export function serializeTransaction(transaction: Transaction & { amount: Prisma.Decimal }) {
   return {
     id: transaction.id,
     title: transaction.title,
@@ -26,12 +31,24 @@ export function serializeTransaction(
   };
 }
 
-export function serializeGoal(goal: Goal & { targetAmount: Prisma.Decimal; currentAmount: Prisma.Decimal }) {
+export function serializeGoal(
+  goal: Goal & { targetAmount: Prisma.Decimal; currentAmount: Prisma.Decimal }
+) {
   return {
     id: goal.id,
     title: goal.title,
     description: goal.description,
     targetAmount: Number(goal.targetAmount),
     currentAmount: Number(goal.currentAmount),
+  };
+}
+
+export function serializeGoalChatMessage(message: GoalChatMessage) {
+  return {
+    id: message.id,
+    goalId: message.goalId,
+    role: message.role === "ASSISTANT" ? "assistant" : "user",
+    content: message.content,
+    createdAt: message.createdAt.toISOString(),
   };
 }
