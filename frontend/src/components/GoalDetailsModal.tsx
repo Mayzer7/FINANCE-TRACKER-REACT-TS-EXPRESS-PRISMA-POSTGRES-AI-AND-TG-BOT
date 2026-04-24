@@ -286,51 +286,53 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
             </div>
           </div>
 
-          <div className={styles.chatFeed}>
-            {isChatLoading ? <p className={styles.chatEmpty}>Загружаем историю чата...</p> : null}
+          <div className={styles.chatShell}>
+            <div className={styles.chatFeed}>
+              {isChatLoading ? <p className={styles.chatEmpty}>Загружаем историю чата...</p> : null}
 
-            {!isChatLoading && messages.length === 0 ? (
-              <p className={styles.chatEmpty}>
-                Начните диалог, и AI подскажет, как быстрее прийти к цели на основе ваших данных.
-              </p>
-            ) : null}
+              {!isChatLoading && messages.length === 0 ? (
+                <p className={styles.chatEmpty}>
+                  Начните диалог, и AI подскажет, как быстрее прийти к цели на основе ваших данных.
+                </p>
+              ) : null}
 
-            {!isChatLoading
-              ? messages.map((message) => (
-                  <article
-                    key={message.id}
-                    className={
-                      message.role === "assistant" ? styles.assistantMessage : styles.userMessage
-                    }
-                  >
-                    <span className={styles.messageRole}>{message.role === "assistant" ? "AI" : "Вы"}</span>
-                    <p>{message.content}</p>
-                  </article>
-                ))
-              : null}
+              {!isChatLoading
+                ? messages.map((message) => (
+                    <article
+                      key={message.id}
+                      className={
+                        message.role === "assistant" ? styles.assistantMessage : styles.userMessage
+                      }
+                    >
+                      <span className={styles.messageRole}>{message.role === "assistant" ? "AI" : "Вы"}</span>
+                      <p>{message.content}</p>
+                    </article>
+                  ))
+                : null}
 
-            <div ref={bottomRef} />
-          </div>
-
-          {chatError ? <p className="form-error">{chatError}</p> : null}
-
-          <form className={styles.chatComposer} onSubmit={handleChatSubmit}>
-            <textarea
-              value={chatInput}
-              onChange={(event) => setChatInput(event.target.value)}
-              placeholder="Например: как мне быстрее накопить на эту цель без сильного урезания качества жизни?"
-              rows={3}
-            />
-            <div className={styles.chatActions}>
-              <button
-                className="button button-primary"
-                type="submit"
-                disabled={isSending || !chatInput.trim()}
-              >
-                {isSending ? "AI думает..." : "Отправить"}
-              </button>
+              <div ref={bottomRef} />
             </div>
-          </form>
+
+            {chatError ? <p className={`form-error ${styles.chatError}`}>{chatError}</p> : null}
+
+            <form className={styles.chatComposer} onSubmit={handleChatSubmit}>
+              <textarea
+                value={chatInput}
+                onChange={(event) => setChatInput(event.target.value)}
+                placeholder="Например: как мне быстрее накопить на эту цель без сильного урезания качества жизни?"
+                rows={3}
+              />
+              <div className={styles.chatActions}>
+                <button
+                  className="button button-primary"
+                  type="submit"
+                  disabled={isSending || !chatInput.trim()}
+                >
+                  {isSending ? "AI думает..." : "Отправить"}
+                </button>
+              </div>
+            </form>
+          </div>
         </section>
       </div>
     </Modal>
