@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useFinance } from "@/hooks/useFinance";
 import { useTheme } from "@/hooks/useTheme";
 import { formatCurrency, formatSignedCurrency } from "@/utils/format";
@@ -12,19 +12,9 @@ const navItems = [
   { to: "/app/categories", label: "Категории", icon: "◎" },
 ];
 
-const pageTitles: Record<string, string> = {
-  "/app/expenses": "Расходы",
-  "/app/income": "Доходы",
-  "/app/transactions": "Все транзакции",
-  "/app/goals": "Цели",
-  "/app/categories": "Категории",
-  "/app/profile": "Профиль",
-};
-
 export function DashboardLayout() {
   const { theme, toggleTheme } = useTheme();
   const { getSummary } = useFinance();
-  const location = useLocation();
   const navigate = useNavigate();
   const summary = getSummary();
 
@@ -73,7 +63,6 @@ export function DashboardLayout() {
           <div>
             <span className="eyebrow">Текущий баланс</span>
             <h1 className={styles.balance}>{formatCurrency(summary.balance)}</h1>
-            <h2 className={styles.title}>{pageTitles[location.pathname] ?? "Aura Finance"}</h2>
           </div>
           <div className={styles.summaryRow}>
             <div className={styles.summaryChip}>

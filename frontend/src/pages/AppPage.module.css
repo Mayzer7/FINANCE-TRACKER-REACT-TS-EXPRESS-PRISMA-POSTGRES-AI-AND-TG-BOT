@@ -1,8 +1,22 @@
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.35rem;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  line-height: 1.02;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
 }
 
 .contentGrid {
@@ -99,10 +113,14 @@
 }
 
 @media (max-width: 640px) {
-  .actions,
+  .pageHeader,
   .goalTop,
   .goalMeta {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .actions {
+    justify-content: stretch;
   }
 }

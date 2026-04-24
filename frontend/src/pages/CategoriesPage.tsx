@@ -26,7 +26,7 @@ function CategoryGroup({
     <section className={`${styles.group} surface`}>
       <div className={styles.groupHeader}>
         <div>
-          <span className="eyebrow">{type === "expense" ? "Expense" : "Income"}</span>
+          <span className="eyebrow">{type === "expense" ? "Расходы" : "Доходы"}</span>
           <h3>{title}</h3>
         </div>
         <button className="button button-primary" type="button" onClick={() => onCreate(type)}>
@@ -68,7 +68,9 @@ function CategoryGroup({
         ))}
 
         {categories.length === 0 ? (
-          <p className={styles.emptyState}>Пока нет категорий. Добавьте первую, чтобы использовать её в операциях.</p>
+          <p className={styles.emptyState}>
+            Пока нет категорий. Добавьте первую, чтобы использовать её в операциях.
+          </p>
         ) : null}
       </div>
     </section>
@@ -101,18 +103,21 @@ export function CategoriesPage() {
 
   return (
     <>
-      <div className={pageStyles.actions}>
-        <button
-          className="button button-primary"
-          type="button"
-          onClick={() => {
-            setActiveCategory(null);
-            setModalType("expense");
-            setIsModalOpen(true);
-          }}
-        >
-          Новая категория
-        </button>
+      <div className={pageStyles.pageHeader}>
+        <h2 className={pageStyles.pageTitle}>Категории</h2>
+        <div className={pageStyles.actions}>
+          <button
+            className="button button-primary"
+            type="button"
+            onClick={() => {
+              setActiveCategory(null);
+              setModalType("expense");
+              setIsModalOpen(true);
+            }}
+          >
+            Новая категория
+          </button>
+        </div>
       </div>
 
       {error ? <p className="form-error">{error}</p> : null}

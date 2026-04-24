@@ -75,11 +75,6 @@
   line-height: 0.9;
 }
 
-.title {
-  margin: 1rem 0 0;
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-}
-
 .summaryRow {
   display: flex;
   gap: 0.9rem;
@@ -134,5 +129,9 @@
   .summaryRow {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .summaryChip {
+    text-align: left;
   }
 }

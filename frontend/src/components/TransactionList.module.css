@@ -4,12 +4,13 @@
 }
 
 .title {
-  padding: 1.4rem 1.6rem 0;
+  padding: 1.4rem 1.6rem 0.8rem;
   color: var(--text-muted);
 }
 
 .list {
   display: grid;
+  padding-top: 0.15rem;
 }
 
 .item {

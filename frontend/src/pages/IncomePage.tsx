@@ -13,13 +13,16 @@ export function IncomePage() {
 
   return (
     <>
-      <div className={pageStyles.actions}>
-        <button className="button button-secondary" type="button">
-          Скачать
-        </button>
-        <button className="button button-primary" type="button" onClick={() => setIsModalOpen(true)}>
-          Добавить
-        </button>
+      <div className={pageStyles.pageHeader}>
+        <h2 className={pageStyles.pageTitle}>Доходы</h2>
+        <div className={pageStyles.actions}>
+          <button className="button button-secondary" type="button">
+            Скачать
+          </button>
+          <button className="button button-primary" type="button" onClick={() => setIsModalOpen(true)}>
+            Добавить
+          </button>
+        </div>
       </div>
 
       {error ? <p className="form-error">{error}</p> : null}

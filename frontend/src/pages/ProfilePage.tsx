@@ -45,6 +45,10 @@ export function ProfilePage() {
 
   return (
     <section className={styles.page}>
+      <div className={pageStyles.pageHeader}>
+        <h2 className={pageStyles.pageTitle}>Профиль</h2>
+      </div>
+
       <div className={styles.grid}>
         <article className={`${styles.card} surface`}>
           <span className="eyebrow">Аккаунт</span>

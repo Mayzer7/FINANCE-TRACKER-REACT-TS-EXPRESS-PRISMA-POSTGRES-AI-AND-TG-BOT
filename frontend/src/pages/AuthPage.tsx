@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./AuthPage.module.css";
 
@@ -8,7 +8,7 @@ type AuthPageProps = {
 };
 
 export function AuthPage({ mode }: AuthPageProps) {
-  const { login, register, isLoading } = useAuth();
+  const { login, register, isLoading, session } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
@@ -17,6 +17,10 @@ export function AuthPage({ mode }: AuthPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isLogin = mode === "login";
+
+  if (!isLoading && session) {
+    return <Navigate to="/app/expenses" replace />;
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

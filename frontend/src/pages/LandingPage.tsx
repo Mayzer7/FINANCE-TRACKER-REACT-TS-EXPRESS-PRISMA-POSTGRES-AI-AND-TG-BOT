@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/hooks/useAuth";
 import styles from "./LandingPage.module.css";
 
 const featureCards = [
@@ -51,10 +52,20 @@ const goalMoments = [
 const aiMessages = [
   { role: "assistant", text: "Темп накоплений позволяет закрыть цель на 6 недель раньше." },
   { role: "user", text: "Что лучше сократить в этом месяце без ощущения жёстких ограничений?" },
-  { role: "assistant", text: "Сначала урежьте спонтанные подписки и кафе в будни — это даст самый мягкий эффект." },
+  {
+    role: "assistant",
+    text: "Сначала урежьте спонтанные подписки и кафе в будни — это даст самый мягкий эффект.",
+  },
 ];
 
 export function LandingPage() {
+  const { session } = useAuth();
+  const appEntryPath = "/app/expenses";
+  const primaryAuthPath = session ? appEntryPath : "/register";
+  const secondaryAuthPath = session ? appEntryPath : "/login";
+  const primaryAuthLabel = session ? "Открыть приложение" : "Начать";
+  const secondaryAuthLabel = session ? "Вернуться в кабинет" : "Войти";
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -64,11 +75,11 @@ export function LandingPage() {
         </div>
         <div className={styles.actions}>
           <ThemeToggle className={styles.themeToggle} />
-          <Link className="link-button" to="/login">
-            Войти
+          <Link className="link-button" to={secondaryAuthPath}>
+            {secondaryAuthLabel}
           </Link>
-          <Link className="button button-primary" to="/register">
-            Начать
+          <Link className="button button-primary" to={primaryAuthPath}>
+            {primaryAuthLabel}
           </Link>
         </div>
       </header>
@@ -85,11 +96,11 @@ export function LandingPage() {
               одном тихом, продуманном интерфейсе.
             </p>
             <div className={styles.heroActions}>
-              <Link className="button button-primary" to="/register">
-                Начать бесплатно
+              <Link className="button button-primary" to={primaryAuthPath}>
+                {session ? "Вернуться в приложение" : "Начать бесплатно"}
               </Link>
-              <Link className="button button-secondary" to="/login">
-                Посмотреть демо-поток
+              <Link className="button button-secondary" to={secondaryAuthPath}>
+                {session ? "Открыть кабинет" : "Посмотреть демо-поток"}
               </Link>
             </div>
           </div>
@@ -311,11 +322,11 @@ export function LandingPage() {
             перегруза и лишних настроек.
           </p>
           <div className={styles.finalActions}>
-            <Link className="button button-primary" to="/register">
-              Создать аккаунт
+            <Link className="button button-primary" to={primaryAuthPath}>
+              {session ? "Открыть приложение" : "Создать аккаунт"}
             </Link>
-            <Link className="button button-secondary" to="/login">
-              Уже есть аккаунт
+            <Link className="button button-secondary" to={secondaryAuthPath}>
+              {session ? "Вернуться в кабинет" : "Уже есть аккаунт"}
             </Link>
           </div>
         </section>

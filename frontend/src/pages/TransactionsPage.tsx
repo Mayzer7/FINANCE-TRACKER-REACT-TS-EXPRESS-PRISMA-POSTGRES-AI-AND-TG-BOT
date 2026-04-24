@@ -7,10 +7,13 @@ export function TransactionsPage() {
 
   return (
     <>
-      <div className={pageStyles.actions}>
-        <button className="button button-secondary" type="button">
-          Скачать
-        </button>
+      <div className={pageStyles.pageHeader}>
+        <h2 className={pageStyles.pageTitle}>Все транзакции</h2>
+        <div className={pageStyles.actions}>
+          <button className="button button-secondary" type="button">
+            Скачать
+          </button>
+        </div>
       </div>
 
       {error ? <p className="form-error">{error}</p> : null}
