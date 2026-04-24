@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { DonutCard } from "@/components/DonutCard";
+import { TransactionEditModal } from "@/components/TransactionEditModal";
 import { TransactionList } from "@/components/TransactionList";
 import { TransactionModal } from "@/components/TransactionModal";
 import { useFinance } from "@/hooks/useFinance";
 import { exportExpensesReport } from "@/services/exportReports";
+import type { Transaction } from "@/types";
 import pageStyles from "./AppPage.module.css";
 
 export function ExpensesPage() {
   const { transactions, categories, summary, isLoading, error } = useFinance();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const expenseTransactions = transactions.filter((transaction) => transaction.type === "expense");
@@ -27,7 +30,12 @@ export function ExpensesPage() {
       <div className={pageStyles.pageHeader}>
         <h2 className={pageStyles.pageTitle}>Расходы</h2>
         <div className={pageStyles.actions}>
-          <button className="button button-secondary" type="button" onClick={() => void handleExport()} disabled={isExporting}>
+          <button
+            className="button button-secondary"
+            type="button"
+            onClick={() => void handleExport()}
+            disabled={isExporting}
+          >
             {isExporting ? "Готовим..." : "Скачать"}
           </button>
           <button className="button button-primary" type="button" onClick={() => setIsModalOpen(true)}>
@@ -41,11 +49,15 @@ export function ExpensesPage() {
 
       <section className={pageStyles.contentGrid}>
         <DonutCard type="expense" />
-        <TransactionList transactions={expenseTransactions} />
+        <TransactionList transactions={expenseTransactions} onTransactionClick={setActiveTransaction} />
       </section>
 
-      {isModalOpen ? (
-        <TransactionModal defaultType="expense" onClose={() => setIsModalOpen(false)} />
+      {isModalOpen ? <TransactionModal defaultType="expense" onClose={() => setIsModalOpen(false)} /> : null}
+      {activeTransaction ? (
+        <TransactionEditModal
+          transaction={activeTransaction}
+          onClose={() => setActiveTransaction(null)}
+        />
       ) : null}
     </>
   );

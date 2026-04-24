@@ -7,6 +7,8 @@ export const transactionSchema = z.object({
   categoryId: z.string().min(1),
 });
 
+export const transactionUpdateSchema = transactionSchema;
+
 export const goalSchema = z.object({
   title: z.string().trim().min(1),
   description: z.string().trim().min(1),

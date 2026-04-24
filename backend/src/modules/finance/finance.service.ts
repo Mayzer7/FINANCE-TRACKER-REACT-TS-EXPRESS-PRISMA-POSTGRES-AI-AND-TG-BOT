@@ -50,6 +50,18 @@ async function getGoalOrThrow(userId: string, goalId: string) {
   return goal;
 }
 
+async function getTransactionOrThrow(userId: string, transactionId: string) {
+  const transaction = await prisma.transaction.findFirst({
+    where: { id: transactionId, userId },
+  });
+
+  if (!transaction) {
+    throw new HttpError(404, "Операция не найдена");
+  }
+
+  return transaction;
+}
+
 export const financeService = {
   async getDashboard(userId: string) {
     const [categories, transactions, goals, adjustments] = await Promise.all([
@@ -191,6 +203,42 @@ export const financeService = {
     });
 
     return serializeTransaction(transaction);
+  },
+
+  async updateTransaction(
+    userId: string,
+    transactionId: string,
+    payload: { title: string; amount: number; type: "EXPENSE" | "INCOME"; categoryId: string }
+  ) {
+    await getTransactionOrThrow(userId, transactionId);
+
+    const category = await prisma.category.findFirst({
+      where: { id: payload.categoryId, userId, type: payload.type },
+    });
+
+    if (!category) {
+      throw new HttpError(404, "Категория не найдена или не подходит под тип операции");
+    }
+
+    const transaction = await prisma.transaction.update({
+      where: { id: transactionId },
+      data: {
+        title: payload.title,
+        amount: new Prisma.Decimal(payload.amount),
+        type: payload.type,
+        categoryId: payload.categoryId,
+      },
+    });
+
+    return serializeTransaction(transaction);
+  },
+
+  async deleteTransaction(userId: string, transactionId: string) {
+    await getTransactionOrThrow(userId, transactionId);
+
+    await prisma.transaction.delete({
+      where: { id: transactionId },
+    });
   },
 
   async createGoal(

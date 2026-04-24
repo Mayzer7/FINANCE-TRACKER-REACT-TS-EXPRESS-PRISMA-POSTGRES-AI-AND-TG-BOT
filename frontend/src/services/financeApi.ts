@@ -31,6 +31,28 @@ export const financeApi = {
     });
   },
 
+  updateTransaction(
+    token: string,
+    transactionId: string,
+    payload: { title: string; amount: number; categoryId: string; type: TransactionType }
+  ) {
+    return apiRequest<Transaction>(`/finance/transactions/${transactionId}`, {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({
+        ...payload,
+        type: payload.type.toUpperCase(),
+      }),
+    });
+  },
+
+  deleteTransaction(token: string, transactionId: string) {
+    return apiRequest<void>(`/finance/transactions/${transactionId}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+
   createGoal(
     token: string,
     payload: { title: string; description: string; targetAmount: number; currentAmount: number }

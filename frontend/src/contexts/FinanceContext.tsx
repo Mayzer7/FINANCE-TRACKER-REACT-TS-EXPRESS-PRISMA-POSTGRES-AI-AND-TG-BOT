@@ -9,6 +9,8 @@ const FALLBACK_MESSAGES = {
   load: "Не удалось загрузить данные",
   session: "Сессия не найдена",
   transaction: "Не удалось добавить операцию",
+  transactionUpdate: "Не удалось обновить операцию",
+  transactionDelete: "Не удалось удалить операцию",
   goal: "Не удалось создать цель",
   goalUpdate: "Не удалось обновить сумму цели",
   goalDelete: "Не удалось удалить цель",
@@ -96,6 +98,40 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       return {
         ok: false,
         error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.transaction,
+      };
+    }
+  };
+
+  const updateTransaction: FinanceContextValue["updateTransaction"] = async (transactionId, payload) => {
+    if (!session?.token) {
+      return { ok: false, error: FALLBACK_MESSAGES.session };
+    }
+
+    try {
+      await financeApi.updateTransaction(session.token, transactionId, payload);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.transactionUpdate,
+      };
+    }
+  };
+
+  const deleteTransaction: FinanceContextValue["deleteTransaction"] = async (transactionId) => {
+    if (!session?.token) {
+      return { ok: false, error: FALLBACK_MESSAGES.session };
+    }
+
+    try {
+      await financeApi.deleteTransaction(session.token, transactionId);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.transactionDelete,
       };
     }
   };
@@ -282,6 +318,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     error,
     refresh,
     addTransaction,
+    updateTransaction,
+    deleteTransaction,
     addGoal,
     updateGoalCurrentAmount,
     deleteGoal,

@@ -84,20 +84,28 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
             Доход
           </button>
         </div>
+
         <label>
-          Название
-          <input value={title} onChange={(event) => setTitle(event.target.value)} />
+          <span>Название</span>
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Например, зарплата"
+          />
         </label>
+
         <label>
-          Сумма, ₽
+          <span>Сумма, ₽</span>
           <input
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             inputMode="numeric"
+            placeholder="0"
           />
         </label>
+
         <label>
-          Категория
+          <span>Категория</span>
           <CategoryPicker
             categories={scopedCategories}
             value={categoryId}
@@ -105,7 +113,9 @@ export function TransactionModal({ defaultType, onClose }: TransactionModalProps
             placeholder="Выберите категорию"
           />
         </label>
+
         {error ? <p className="form-error">{error}</p> : null}
+
         <button
           className="button button-primary button-full"
           type="submit"

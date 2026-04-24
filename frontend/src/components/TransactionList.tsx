@@ -1,57 +1,76 @@
 import { useFinance } from "@/hooks/useFinance";
 import type { Transaction } from "@/types";
-import { formatDateTime, formatSignedCurrency, getFirstLetter } from "@/utils/format";
+import { formatCurrency, formatDateTime, getFirstLetter } from "@/utils/format";
 import styles from "./TransactionList.module.css";
 
 type TransactionListProps = {
   transactions: Transaction[];
-  emptyText?: string;
+  onTransactionClick?: (transaction: Transaction) => void;
 };
 
-export function TransactionList({
-  transactions,
-  emptyText = "Транзакции появятся здесь",
-}: TransactionListProps) {
+export function TransactionList({ transactions, onTransactionClick }: TransactionListProps) {
   const { categories } = useFinance();
 
-  if (transactions.length === 0) {
-    return <div className={styles.emptyState}>{emptyText}</div>;
+  if (!transactions.length) {
+    return (
+      <section className={`surface ${styles.panel}`}>
+        <div className={styles.title}>История</div>
+        <div className={styles.emptyState}>Пока здесь нет операций. Добавьте первую запись, чтобы увидеть историю.</div>
+      </section>
+    );
   }
 
   return (
-    <div className={`${styles.panel} surface`}>
+    <section className={`surface ${styles.panel}`}>
       <div className={styles.title}>История</div>
       <div className={styles.list}>
         {transactions.map((transaction) => {
           const category = categories.find((item) => item.id === transaction.categoryId);
-          const signedAmount =
-            transaction.type === "income" ? transaction.amount : -transaction.amount;
+          const isIncome = transaction.type === "income";
+          const itemClassName = onTransactionClick
+            ? `${styles.item} ${styles.itemInteractive}`
+            : styles.item;
 
           return (
-            <article className={styles.item} key={transaction.id}>
+            <article
+              className={itemClassName}
+              key={transaction.id}
+              onClick={onTransactionClick ? () => onTransactionClick(transaction) : undefined}
+              onKeyDown={
+                onTransactionClick
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onTransactionClick(transaction);
+                      }
+                    }
+                  : undefined
+              }
+              role={onTransactionClick ? "button" : undefined}
+              tabIndex={onTransactionClick ? 0 : undefined}
+            >
               <div
                 className={styles.badge}
-                style={{ backgroundColor: `${category?.color ?? "#7DB89A"}30`, color: category?.color }}
+                style={{ backgroundColor: category ? `${category.color}22` : "rgba(255,255,255,0.08)" }}
               >
                 {getFirstLetter(category?.name ?? transaction.title)}
               </div>
+
               <div className={styles.copy}>
                 <strong>{transaction.title}</strong>
                 <span>
                   {category?.name ?? "Категория"} · {formatDateTime(transaction.createdAt)}
                 </span>
               </div>
-              <div
-                className={`${styles.amount} ${
-                  transaction.type === "income" ? styles.amountIncome : ""
-                }`}
-              >
-                {formatSignedCurrency(signedAmount)}
+
+              <div className={isIncome ? `${styles.amount} ${styles.amountIncome}` : styles.amount}>
+                {isIncome ? "+" : "−"}
+                {formatCurrency(transaction.amount)}
               </div>
             </article>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

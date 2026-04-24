@@ -11,6 +11,8 @@ financeRouter.post("/categories", asyncHandler(financeController.createCategory)
 financeRouter.patch("/categories/:categoryId", asyncHandler(financeController.updateCategory));
 financeRouter.delete("/categories/:categoryId", asyncHandler(financeController.deleteCategory));
 financeRouter.post("/transactions", asyncHandler(financeController.createTransaction));
+financeRouter.patch("/transactions/:transactionId", asyncHandler(financeController.updateTransaction));
+financeRouter.delete("/transactions/:transactionId", asyncHandler(financeController.deleteTransaction));
 financeRouter.post("/goals", asyncHandler(financeController.createGoal));
 financeRouter.patch("/goals/:goalId", asyncHandler(financeController.updateGoal));
 financeRouter.delete("/goals/:goalId", asyncHandler(financeController.deleteGoal));

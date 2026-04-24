@@ -9,6 +9,7 @@ import {
   goalSchema,
   goalUpdateSchema,
   transactionSchema,
+  transactionUpdateSchema,
 } from "./finance.schemas.js";
 
 function getRouteParam(value: string | string[] | undefined) {
@@ -25,6 +26,19 @@ export const financeController = {
     const payload = transactionSchema.parse(request.body);
     const result = await financeService.createTransaction(request.user!.sub, payload);
     return response.status(201).json(result);
+  },
+
+  async updateTransaction(request: Request, response: Response) {
+    const transactionId = getRouteParam(request.params.transactionId);
+    const payload = transactionUpdateSchema.parse(request.body);
+    const result = await financeService.updateTransaction(request.user!.sub, transactionId, payload);
+    return response.status(200).json(result);
+  },
+
+  async deleteTransaction(request: Request, response: Response) {
+    const transactionId = getRouteParam(request.params.transactionId);
+    await financeService.deleteTransaction(request.user!.sub, transactionId);
+    return response.status(204).send();
   },
 
   async createGoal(request: Request, response: Response) {

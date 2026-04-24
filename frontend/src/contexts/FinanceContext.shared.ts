@@ -11,6 +11,16 @@ export type FinanceContextValue = DashboardData & {
     categoryId: string;
     type: "expense" | "income";
   }) => Promise<{ ok: boolean; error?: string }>;
+  updateTransaction: (
+    transactionId: string,
+    payload: {
+      title: string;
+      amount: number;
+      categoryId: string;
+      type: "expense" | "income";
+    }
+  ) => Promise<{ ok: boolean; error?: string }>;
+  deleteTransaction: (transactionId: string) => Promise<{ ok: boolean; error?: string }>;
   addGoal: (payload: {
     title: string;
     description: string;
