@@ -199,6 +199,35 @@
   background: rgba(130, 190, 147, 0.12);
 }
 
+.formattedMessage {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.messageParagraph,
+.messageList {
+  margin: 0;
+}
+
+.messageParagraph {
+  line-height: 1.7;
+}
+
+.messageList,
+.messageOrderedList {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.15rem;
+}
+
+.messageOrderedList {
+  margin: 0;
+}
+
+.messageListItem {
+  line-height: 1.65;
+}
+
 .chatComposer {
   position: sticky;
   bottom: 0;

@@ -10,6 +10,10 @@ type GoalDetailsModalProps = {
   onClose: () => void;
 };
 
+type MessageBlock =
+  | { type: "paragraph"; content: string }
+  | { type: "list"; items: string[]; ordered: boolean };
+
 function TrashIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none">
@@ -21,6 +25,87 @@ function TrashIcon() {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+function normalizeAssistantContent(content: string) {
+  return content
+    .replace(/\r\n/g, "\n")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^\s*#{1,6}\s*/gm, "")
+    .replace(/^\s*>\s?/gm, "")
+    .replace(/\s-\s(?=[A-ZА-Я0-9])/g, "\n- ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function getAssistantMessageBlocks(content: string): MessageBlock[] {
+  const normalized = normalizeAssistantContent(content);
+  if (!normalized) {
+    return [{ type: "paragraph", content: "" }];
+  }
+
+  const chunks = normalized.split(/\n{2,}/).map((chunk) => chunk.trim()).filter(Boolean);
+
+  return chunks.map((chunk) => {
+    const lines = chunk.split("\n").map((line) => line.trim()).filter(Boolean);
+
+    if (lines.length > 0 && lines.every((line) => /^[-•]\s+/.test(line))) {
+      return {
+        type: "list",
+        ordered: false,
+        items: lines.map((line) => line.replace(/^[-•]\s+/, "").trim()),
+      };
+    }
+
+    if (lines.length > 0 && lines.every((line) => /^\d+\.\s+/.test(line))) {
+      return {
+        type: "list",
+        ordered: true,
+        items: lines.map((line) => line.replace(/^\d+\.\s+/, "").trim()),
+      };
+    }
+
+    return {
+      type: "paragraph",
+      content: lines.join(" "),
+    };
+  });
+}
+
+function renderAssistantMessage(content: string) {
+  const blocks = getAssistantMessageBlocks(content);
+
+  return (
+    <div className={styles.formattedMessage}>
+      {blocks.map((block, index) => {
+        if (block.type === "list") {
+          const ListTag = block.ordered ? "ol" : "ul";
+
+          return (
+            <ListTag
+              className={block.ordered ? styles.messageOrderedList : styles.messageList}
+              key={`${block.type}-${index}`}
+            >
+              {block.items.map((item, itemIndex) => (
+                <li className={styles.messageListItem} key={`${block.type}-${index}-${itemIndex}`}>
+                  {item}
+                </li>
+              ))}
+            </ListTag>
+          );
+        }
+
+        return (
+          <p className={styles.messageParagraph} key={`${block.type}-${index}`}>
+            {block.content}
+          </p>
+        );
+      })}
+    </div>
   );
 }
 
@@ -305,7 +390,7 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
                       }
                     >
                       <span className={styles.messageRole}>{message.role === "assistant" ? "AI" : "Вы"}</span>
-                      <p>{message.content}</p>
+                      {message.role === "assistant" ? renderAssistantMessage(message.content) : <p>{message.content}</p>}
                     </article>
                   ))
                 : null}
