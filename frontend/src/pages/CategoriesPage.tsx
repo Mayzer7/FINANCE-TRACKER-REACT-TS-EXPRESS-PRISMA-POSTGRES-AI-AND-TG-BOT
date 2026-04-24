@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { CategoryModal } from "@/components/CategoryModal";
 import { useFinance } from "@/hooks/useFinance";
+import { exportCategoriesReport } from "@/services/exportReports";
 import type { Category, TransactionType } from "@/types";
 import pageStyles from "./AppPage.module.css";
 import styles from "./CategoriesPage.module.css";
@@ -83,6 +84,7 @@ export function CategoriesPage() {
   const [modalType, setModalType] = useState<TransactionType>("expense");
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [deleteError, setDeleteError] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   const expenseCategories = useMemo(
     () => categories.filter((category) => category.type === "expense"),
@@ -101,11 +103,28 @@ export function CategoriesPage() {
     }
   };
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportCategoriesReport({ categories });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <>
       <div className={pageStyles.pageHeader}>
         <h2 className={pageStyles.pageTitle}>Категории</h2>
         <div className={pageStyles.actions}>
+          <button
+            className="button button-secondary"
+            type="button"
+            onClick={() => void handleExport()}
+            disabled={isExporting}
+          >
+            {isExporting ? "Готовим..." : "Скачать"}
+          </button>
           <button
             className="button button-primary"
             type="button"

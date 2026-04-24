@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GoalDetailsModal } from "@/components/GoalDetailsModal";
 import { GoalModal } from "@/components/GoalModal";
 import { useFinance } from "@/hooks/useFinance";
+import { exportGoalsReport } from "@/services/exportReports";
 import { formatCurrency } from "@/utils/format";
 import pageStyles from "./AppPage.module.css";
 
@@ -9,16 +10,26 @@ export function GoalsPage() {
   const { goals, isLoading, error } = useFinance();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [activeGoalId, setActiveGoalId] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const activeGoal = goals.find((goal) => goal.id === activeGoalId) ?? null;
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportGoalsReport({ goals });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <>
       <div className={pageStyles.pageHeader}>
         <h2 className={pageStyles.pageTitle}>Цели</h2>
         <div className={pageStyles.actions}>
-          <button className="button button-secondary" type="button">
-            Скачать
+          <button className="button button-secondary" type="button" onClick={() => void handleExport()} disabled={isExporting}>
+            {isExporting ? "Готовим..." : "Скачать"}
           </button>
           <button className="button button-primary" type="button" onClick={() => setIsCreateOpen(true)}>
             Новая цель
