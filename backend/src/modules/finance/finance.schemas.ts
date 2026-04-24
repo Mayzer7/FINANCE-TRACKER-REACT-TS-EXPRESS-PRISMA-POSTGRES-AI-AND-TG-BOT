@@ -18,6 +18,10 @@ export const goalContributionSchema = z.object({
   amount: z.coerce.number().positive(),
 });
 
+export const goalUpdateSchema = z.object({
+  currentAmount: z.coerce.number().min(0),
+});
+
 export const goalChatMessageSchema = z.object({
   content: z.string().trim().min(1).max(4000),
 });

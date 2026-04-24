@@ -42,6 +42,14 @@ export const financeApi = {
     });
   },
 
+  updateGoalCurrentAmount(token: string, goalId: string, currentAmount: number) {
+    return apiRequest<Goal>(`/finance/goals/${goalId}`, {
+      method: "PATCH",
+      token,
+      body: JSON.stringify({ currentAmount }),
+    });
+  },
+
   deleteGoal(token: string, goalId: string) {
     return apiRequest<void>(`/finance/goals/${goalId}`, {
       method: "DELETE",

@@ -12,6 +12,7 @@ financeRouter.patch("/categories/:categoryId", asyncHandler(financeController.up
 financeRouter.delete("/categories/:categoryId", asyncHandler(financeController.deleteCategory));
 financeRouter.post("/transactions", asyncHandler(financeController.createTransaction));
 financeRouter.post("/goals", asyncHandler(financeController.createGoal));
+financeRouter.patch("/goals/:goalId", asyncHandler(financeController.updateGoal));
 financeRouter.delete("/goals/:goalId", asyncHandler(financeController.deleteGoal));
 financeRouter.get("/goals/:goalId/chat", asyncHandler(financeController.getGoalChat));
 financeRouter.post("/goals/:goalId/chat", asyncHandler(financeController.sendGoalChatMessage));

@@ -25,18 +25,23 @@ function TrashIcon() {
 }
 
 export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
-  const { contributeToGoal, deleteGoal, getGoalChat, sendGoalChatMessage } = useFinance();
+  const { contributeToGoal, updateGoalCurrentAmount, deleteGoal, getGoalChat, sendGoalChatMessage } =
+    useFinance();
   const [amount, setAmount] = useState("");
+  const [editAmount, setEditAmount] = useState(String(goal.currentAmount));
   const [messages, setMessages] = useState<GoalChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [error, setError] = useState("");
+  const [editError, setEditError] = useState("");
   const [chatError, setChatError] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isChatLoading, setIsChatLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [isDeleteConfirmVisible, setIsDeleteConfirmVisible] = useState(false);
+  const [isEditVisible, setIsEditVisible] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const progress = useMemo(
@@ -87,6 +92,37 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
     }
 
     setAmount("");
+  };
+
+  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextAmount = Number(editAmount);
+
+    if (Number.isNaN(nextAmount) || nextAmount < 0) {
+      setEditError("Введите корректную текущую сумму");
+      return;
+    }
+
+    const safeAmount = Math.min(nextAmount, goal.targetAmount);
+    if (safeAmount === goal.currentAmount) {
+      setIsEditVisible(false);
+      setEditError("");
+      return;
+    }
+
+    setIsEditSubmitting(true);
+    setEditError("");
+
+    const result = await updateGoalCurrentAmount(goal.id, safeAmount);
+
+    setIsEditSubmitting(false);
+
+    if (!result.ok) {
+      setEditError(result.error ?? "Не удалось обновить сумму цели");
+      return;
+    }
+
+    setIsEditVisible(false);
   };
 
   const handleDelete = async () => {
@@ -175,12 +211,58 @@ export function GoalDetailsModal({ goal, onClose }: GoalDetailsModalProps) {
           <div className={styles.progressBar}>
             <span style={{ width: `${progress}%` }} />
           </div>
-          <div className={styles.progressMeta}>
-            <strong>
-              {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
-            </strong>
-            <span>Осталось: {formatCurrency(leftAmount)}</span>
+
+          <div className={styles.progressSummary}>
+            <div className={styles.progressMeta}>
+              <strong>
+                {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
+              </strong>
+              <span>Осталось: {formatCurrency(leftAmount)}</span>
+            </div>
+
+            <button
+              className={`text-button ${styles.editToggle}`}
+              type="button"
+              onClick={() => {
+                setEditAmount(String(goal.currentAmount));
+                setEditError("");
+                setIsEditVisible((prev) => !prev);
+              }}
+            >
+              {isEditVisible ? "Скрыть" : "Изменить"}
+            </button>
           </div>
+
+          {isEditVisible ? (
+            <form className={styles.inlineEdit} onSubmit={handleEditSubmit}>
+              <label className={styles.inlineEditField}>
+                <span>Текущая сумма</span>
+                <input
+                  value={editAmount}
+                  onChange={(event) => setEditAmount(event.target.value)}
+                  inputMode="numeric"
+                  placeholder="Введите текущую сумму"
+                />
+              </label>
+              <div className={styles.inlineEditActions}>
+                <button
+                  className={`text-button ${styles.inlineEditCancel}`}
+                  type="button"
+                  onClick={() => {
+                    setEditAmount(String(goal.currentAmount));
+                    setEditError("");
+                    setIsEditVisible(false);
+                  }}
+                >
+                  Отмена
+                </button>
+                <button className="button button-secondary" type="submit" disabled={isEditSubmitting}>
+                  {isEditSubmitting ? "Сохраняем..." : "Сохранить"}
+                </button>
+              </div>
+              {editError ? <p className="form-error">{editError}</p> : null}
+            </form>
+          ) : null}
         </div>
 
         <form className={styles.contribution} onSubmit={handleAdd}>

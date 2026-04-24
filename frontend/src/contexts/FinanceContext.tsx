@@ -10,6 +10,7 @@ const FALLBACK_MESSAGES = {
   session: "Сессия не найдена",
   transaction: "Не удалось добавить операцию",
   goal: "Не удалось создать цель",
+  goalUpdate: "Не удалось обновить сумму цели",
   goalDelete: "Не удалось удалить цель",
   goalChatLoad: "Не удалось загрузить историю чата",
   goalChatSend: "Не удалось получить ответ AI",
@@ -112,6 +113,26 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       return {
         ok: false,
         error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.goal,
+      };
+    }
+  };
+
+  const updateGoalCurrentAmount: FinanceContextValue["updateGoalCurrentAmount"] = async (
+    goalId,
+    currentAmount
+  ) => {
+    if (!session?.token) {
+      return { ok: false, error: FALLBACK_MESSAGES.session };
+    }
+
+    try {
+      await financeApi.updateGoalCurrentAmount(session.token, goalId, currentAmount);
+      await refresh();
+      return { ok: true };
+    } catch (errorValue) {
+      return {
+        ok: false,
+        error: errorValue instanceof ApiError ? errorValue.message : FALLBACK_MESSAGES.goalUpdate,
       };
     }
   };
@@ -262,6 +283,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     refresh,
     addTransaction,
     addGoal,
+    updateGoalCurrentAmount,
     deleteGoal,
     getGoalChat,
     sendGoalChatMessage,

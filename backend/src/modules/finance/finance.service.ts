@@ -210,6 +210,21 @@ export const financeService = {
     return serializeGoal(goal);
   },
 
+  async updateGoal(userId: string, goalId: string, currentAmount: number) {
+    const existingGoal = await getGoalOrThrow(userId, goalId);
+
+    const safeCurrentAmount = Math.min(currentAmount, Number(existingGoal.targetAmount));
+
+    const goal = await prisma.goal.update({
+      where: { id: goalId },
+      data: {
+        currentAmount: new Prisma.Decimal(safeCurrentAmount),
+      },
+    });
+
+    return serializeGoal(goal);
+  },
+
   async deleteGoal(userId: string, goalId: string) {
     await getGoalOrThrow(userId, goalId);
 

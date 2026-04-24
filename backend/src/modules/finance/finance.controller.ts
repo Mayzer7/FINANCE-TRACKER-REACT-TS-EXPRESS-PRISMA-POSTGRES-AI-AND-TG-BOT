@@ -7,6 +7,7 @@ import {
   goalChatMessageSchema,
   goalContributionSchema,
   goalSchema,
+  goalUpdateSchema,
   transactionSchema,
 } from "./finance.schemas.js";
 
@@ -30,6 +31,13 @@ export const financeController = {
     const payload = goalSchema.parse(request.body);
     const result = await financeService.createGoal(request.user!.sub, payload);
     return response.status(201).json(result);
+  },
+
+  async updateGoal(request: Request, response: Response) {
+    const payload = goalUpdateSchema.parse(request.body);
+    const goalId = getRouteParam(request.params.goalId);
+    const result = await financeService.updateGoal(request.user!.sub, goalId, payload.currentAmount);
+    return response.status(200).json(result);
   },
 
   async deleteGoal(request: Request, response: Response) {

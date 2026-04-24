@@ -17,6 +17,7 @@ export type FinanceContextValue = DashboardData & {
     targetAmount: number;
     currentAmount: number;
   }) => Promise<{ ok: boolean; error?: string }>;
+  updateGoalCurrentAmount: (goalId: string, currentAmount: number) => Promise<{ ok: boolean; error?: string }>;
   deleteGoal: (goalId: string) => Promise<{ ok: boolean; error?: string }>;
   getGoalChat: (goalId: string) => Promise<{
     ok: boolean;

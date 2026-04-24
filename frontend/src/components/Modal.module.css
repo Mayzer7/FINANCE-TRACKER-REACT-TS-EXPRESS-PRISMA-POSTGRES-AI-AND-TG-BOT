@@ -16,6 +16,14 @@
   border-radius: 1.9rem;
 }
 
+.shell::-webkit-scrollbar {
+  display: none;
+}
+
+.shell {
+  scrollbar-width: none;
+}
+
 .header {
   display: flex;
   align-items: flex-start;
