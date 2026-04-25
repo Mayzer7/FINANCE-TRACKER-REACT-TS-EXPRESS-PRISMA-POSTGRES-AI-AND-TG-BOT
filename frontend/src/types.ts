@@ -62,3 +62,11 @@ export type UserSession = {
   token: string;
   loggedInAt: string;
 };
+
+export type TelegramStatus = {
+  connected: boolean;
+  username: string | null;
+  firstName: string | null;
+  linkedAt: string | null;
+  label: string;
+};

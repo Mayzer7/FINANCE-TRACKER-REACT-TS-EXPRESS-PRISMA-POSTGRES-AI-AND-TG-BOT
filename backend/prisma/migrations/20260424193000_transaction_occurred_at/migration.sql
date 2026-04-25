@@ -1,0 +1,3 @@
+-- This migration was intentionally left empty after the occurredAt experiment
+-- was reverted from the codebase. The directory remains in the migration chain
+-- so Prisma migrate deploy can replay history consistently.

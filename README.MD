@@ -1,175 +1,110 @@
 # Aura Finance
 
-Современный full-stack проект для финансового трекинга.
+Локальный full-stack проект для учёта личных финансов:
 
-- `frontend`: React + TypeScript + Vite SPA
+- `frontend`: React + TypeScript + Vite
 - `backend`: Express + TypeScript + Prisma
 - `database`: PostgreSQL в Docker
+- `telegram bot`: быстрый ввод доходов и расходов в тот же аккаунт
 
-Интерфейс собирается как single page application, а backend уже готов для локальной разработки через Prisma и PostgreSQL.
+## Быстрый старт
 
-## Структура проекта
-
-```text
-FINANCE-TRACKER/
-├── frontend/         # React SPA
-├── backend/          # Express API + Prisma
-├── references/       # Макеты и референсы
-└── docker-compose.yml
-```
-
-## Что нужно перед стартом
-
-Установите:
-
-- `Node.js` 22+
-- `npm` 10+
-- `Docker Desktop`
-- `Git`
-
-Проверьте, что команды доступны:
+### 1. Поднять базу
 
 ```powershell
-node -v
-npm -v
-docker -v
-docker compose version
-```
-
-## Быстрый старт после clone
-
-### 1. Клонировать проект
-
-```powershell
-git clone <URL_ВАШЕГО_РЕПО>
-cd FINANCE-TRACKER
-```
-
-### 2. Установить зависимости
-
-```powershell
-cd D:\work\FINANCE-TRACKER\frontend
-npm install
-
-cd D:\work\FINANCE-TRACKER\backend
-npm install
-```
-
-### 3. Поднять PostgreSQL в Docker
-
-Из корня проекта:
-
-```powershell
-cd D:\work\FINANCE-TRACKER
 docker compose up -d postgres
 ```
 
-Проверить, что контейнер жив:
+### 2. Настроить backend
 
-```powershell
-docker compose ps
-```
+Файл окружения:
 
-## Важный момент по порту базы
+- `backend/.env`
+- пример: `backend/.env.example`
 
-Контейнерный PostgreSQL проброшен на `localhost:5433`, а не на `5432`.
-
-Это сделано специально, чтобы не конфликтовать с локально установленным PostgreSQL на Windows, если он у вас уже запущен как системный сервис.
-
-## Настройка backend
-
-Файл окружения уже предусмотрен:
-
-- [backend/.env](D:\work\FINANCE-TRACKER\backend\.env)
-- пример: [backend/.env.example](D:\work\FINANCE-TRACKER\backend\.env.example)
-
-Основные значения по умолчанию:
+Минимальные переменные:
 
 ```env
 PORT=4000
 CLIENT_ORIGIN=http://localhost:5173
+APP_URL=http://localhost:5173
 DATABASE_URL=postgresql://postgres:postgres@localhost:5433/aura_finance?schema=public
 JWT_SECRET=local-development-secret
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_BOT_USERNAME=
 ```
 
-## Инициализация базы
-
-Перейдите в backend и выполните:
+Инициализация:
 
 ```powershell
-cd D:\work\FINANCE-TRACKER\backend
+cd backend
+npm install
 npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:seed
-```
-
-Что делают команды:
-
-- `prisma:generate` генерирует Prisma Client
-- `prisma:migrate` применяет миграции к локальной базе
-- `prisma:seed` создаёт demo-пользователя и стартовые данные
-
-## Запуск backend
-
-```powershell
-cd D:\work\FINANCE-TRACKER\backend
 npm run dev
 ```
 
-API будет доступен по адресу:
-
-- [http://localhost:4000/api/health](http://localhost:4000/api/health)
-
-## Запуск frontend
-
-В отдельном терминале:
+### 3. Запустить frontend
 
 ```powershell
-cd D:\work\FINANCE-TRACKER\frontend
+cd frontend
+npm install
 npm run dev
 ```
 
-Frontend будет доступен по адресу:
+Приложение:
 
-- [http://localhost:5173](http://localhost:5173)
+- frontend: [http://localhost:5173](http://localhost:5173)
+- backend health: [http://localhost:4000/api/health](http://localhost:4000/api/health)
 
-По умолчанию frontend ходит в backend по:
+## Telegram bot и `APP_URL`
 
-- `http://localhost:4000/api`
+Telegram умеет открывать кнопкой только публичные HTTPS URL. Локальные адреса вроде:
 
-Если позже понадобится другой адрес API, можно добавить `.env` в `frontend`:
+- `http://localhost:5173`
+- `http://127.0.0.1:5173`
+- private LAN IP
+
+для inline-кнопок в Telegram не подходят.
+
+### Режим 1: локальная разработка без tunnel
 
 ```env
-VITE_API_URL=http://localhost:4000/api
+APP_URL=http://localhost:5173
 ```
 
-## Полный локальный workflow
+В этом режиме:
 
-После первого клонирования типичный порядок такой:
+- бот не падает
+- бот пишет понятный текст с адресом сайта
+- ссылку нужно открыть вручную в браузере
 
-```powershell
-cd D:\work\FINANCE-TRACKER
-docker compose up -d postgres
+### Режим 2: кликабельный переход из Telegram в dev
 
-cd D:\work\FINANCE-TRACKER\backend
-npm install
-npm run prisma:generate
-npm run prisma:migrate
-npm run prisma:seed
-npm run dev
+Используйте публичный HTTPS tunnel URL, например через:
+
+- `ngrok`
+- `cloudflared`
+- другой аналогичный tunnel
+
+Пример:
+
+```env
+APP_URL=https://example-tunnel.ngrok-free.app
 ```
 
-Во втором терминале:
+В этом режиме:
 
-```powershell
-cd D:\work\FINANCE-TRACKER\frontend
-npm install
-npm run dev
-```
+- кнопка `Открыть сайт` в Telegram становится кликабельной
+- Telegram показывает стандартное окно подтверждения перехода
+- привязка бота и переходы на страницы сайта работают как в production
 
-## Демо-аккаунт
+После смены `APP_URL` перезапустите backend.
 
-После `npm run prisma:seed` можно войти под тестовым пользователем:
+## Demo-аккаунт
+
+После `npm run prisma:seed`:
 
 - email: `demo@aurafinance.local`
 - password: `demodemo`
@@ -184,9 +119,6 @@ npm run build
 npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:seed
-npm run db:up
-npm run db:down
-npm run db:logs
 ```
 
 ### Frontend
@@ -196,53 +128,3 @@ npm run dev
 npm run build
 npm run lint
 ```
-
-## Проверка, что всё поднялось корректно
-
-Минимальная проверка:
-
-1. Открыть `http://localhost:5173`
-2. Убедиться, что backend отвечает на `http://localhost:4000/api/health`
-3. Выполнить вход через demo-аккаунт
-4. Проверить, что dashboard загружается без ошибок
-
-## Частые проблемы
-
-### Порт `5433` занят
-
-Проверьте, что его не использует другое приложение:
-
-```powershell
-netstat -ano | findstr 5433
-```
-
-Если порт уже кем-то занят, измените проброс порта в [docker-compose.yml](D:\work\FINANCE-TRACKER\docker-compose.yml) и синхронно обновите `DATABASE_URL` в [backend/.env](D:\work\FINANCE-TRACKER\backend\.env).
-
-### Docker не запущен
-
-Если `docker compose up -d postgres` не работает, сначала запустите Docker Desktop и дождитесь, пока он полностью поднимется.
-
-### Prisma не может подключиться к базе
-
-Проверьте:
-
-- контейнер запущен через `docker compose ps`
-- в `backend/.env` указан `localhost:5433`
-- миграции были выполнены через `npm run prisma:migrate`
-
-### Frontend не видит backend
-
-Проверьте:
-
-- backend реально запущен на `4000`
-- `CLIENT_ORIGIN=http://localhost:5173` в `backend/.env`
-- `VITE_API_URL`, если вы переопределяли API URL
-
-## Текущее состояние
-
-Сейчас проект рассчитан на локальную разработку в двух процессах:
-
-- frontend отдельно через Vite
-- backend отдельно через Express
-
-База данных поднимается через Docker Compose.

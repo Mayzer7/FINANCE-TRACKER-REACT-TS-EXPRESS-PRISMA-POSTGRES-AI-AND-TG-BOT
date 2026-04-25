@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authRouter } from "../modules/auth/auth.routes.js";
 import { financeRouter } from "../modules/finance/finance.routes.js";
+import { telegramRouter } from "../modules/telegram/telegram.routes.js";
 
 export const apiRouter = Router();
 
@@ -10,3 +11,4 @@ apiRouter.get("/health", (_request, response) => {
 
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/finance", financeRouter);
+apiRouter.use("/telegram", telegramRouter);
