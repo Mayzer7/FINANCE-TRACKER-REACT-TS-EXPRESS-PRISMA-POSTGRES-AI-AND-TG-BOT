@@ -93,3 +93,33 @@ h3 {
     transform: translateY(0);
   }
 }
+
+
+
+/* Кастомный скролл на странице */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1a;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #f4f1eb;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #f4f1eb;
+}
+
+/* Кастомный скролл для Firefox */
+
+@-moz-document url-prefix() {
+  * {
+    scrollbar-color: #f4f1eb #f4f1eb; 
+    scrollbar-width: thin; 
+  }
+} 
