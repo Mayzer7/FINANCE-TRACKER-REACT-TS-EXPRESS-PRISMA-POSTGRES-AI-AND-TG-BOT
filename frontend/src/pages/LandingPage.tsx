@@ -1,3 +1,4 @@
+import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,6 +66,43 @@ export function LandingPage() {
   const secondaryAuthPath = session ? appEntryPath : "/login";
   const primaryAuthLabel = session ? "Открыть приложение" : "Начать";
   const secondaryAuthLabel = session ? "Вернуться в кабинет" : "Войти";
+  const drawerId = useId();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  const renderHeaderActions = (className?: string, onNavigate?: () => void) => (
+    <div className={className ?? styles.actions}>
+      <ThemeToggle className={styles.themeToggle} />
+      <Link className="link-button button button-secondary" to={secondaryAuthPath} onClick={onNavigate}>
+        {secondaryAuthLabel}
+      </Link>
+      <Link className="button button-primary" to={primaryAuthPath} onClick={onNavigate}>
+        {primaryAuthLabel}
+      </Link>
+    </div>
+  );
 
   return (
     <div className={styles.page}>
@@ -73,16 +111,52 @@ export function LandingPage() {
           <span className="brand-mark" />
           <span>Aura Finance</span>
         </div>
-        <div className={styles.actions}>
-          <ThemeToggle className={styles.themeToggle} />
-          <Link className="link-button" to={secondaryAuthPath}>
-            {secondaryAuthLabel}
-          </Link>
-          <Link className="button button-primary" to={primaryAuthPath}>
-            {primaryAuthLabel}
-          </Link>
-        </div>
+
+        {renderHeaderActions(styles.actions)}
+
+        <button
+          className={styles.burgerButton}
+          type="button"
+          aria-label="Открыть меню"
+          aria-expanded={isMobileMenuOpen}
+          aria-controls={drawerId}
+          onClick={() => setIsMobileMenuOpen(true)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
       </header>
+
+      {isMobileMenuOpen ? (
+        <>
+          <button
+            className={styles.backdrop}
+            type="button"
+            aria-label="Закрыть меню"
+            onClick={closeMobileMenu}
+          />
+          <aside id={drawerId} className={styles.mobileDrawer} aria-label="Меню сайта">
+            <div className={styles.drawerHeader}>
+              <div className="brand">
+                <span className="brand-mark" />
+                <span>Aura Finance</span>
+              </div>
+              <button
+                className={styles.closeButton}
+                type="button"
+                aria-label="Закрыть меню"
+                onClick={closeMobileMenu}
+              >
+                <span />
+                <span />
+              </button>
+            </div>
+
+            {renderHeaderActions(styles.drawerActions, closeMobileMenu)}
+          </aside>
+        </>
+      ) : null}
 
       <main className={styles.content}>
         <section className={`${styles.hero} ${styles.reveal}`}>
@@ -250,7 +324,7 @@ export function LandingPage() {
 
         <section className={`${styles.goalSection} ${styles.reveal}`}>
           <div className={styles.goalCopy}>
-            <span className="eyebrow">Goals spotlight</span>
+            <span className="eyebrow">Фокус на целях</span>
             <h2>Крупные покупки становятся видимыми, а не абстрактными</h2>
             <p>
               Каждая цель превращается в понятную траекторию: видно текущий прогресс, нужный темп и
@@ -292,7 +366,7 @@ export function LandingPage() {
 
         <section className={`${styles.aiSection} ${styles.reveal}`}>
           <div className={styles.aiIntro}>
-            <span className="eyebrow">AI companion</span>
+            <span className="eyebrow">AI-помощник</span>
             <h2>Умный слой поддержки без ощущения навязчивого советчика</h2>
             <p>
               Вместо громких обещаний — короткие, контекстные подсказки, которые помогают уточнить
