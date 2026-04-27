@@ -146,7 +146,7 @@ export function CategoriesPage() {
       <div className={styles.grid}>
         <CategoryGroup
           title="Категории расходов"
-          type="expense"
+          type="expense"  
           categories={expenseCategories}
           onCreate={(type) => {
             setActiveCategory(null);

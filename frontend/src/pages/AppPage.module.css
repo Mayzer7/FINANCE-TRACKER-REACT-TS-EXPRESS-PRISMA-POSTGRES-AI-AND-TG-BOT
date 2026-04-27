@@ -127,6 +127,18 @@
   color: var(--interactive-hover-text);
 }
 
+@media (max-width: 1500px) {
+  .goalGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1300px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 980px) {
   .contentGrid,
   .goalGrid {
