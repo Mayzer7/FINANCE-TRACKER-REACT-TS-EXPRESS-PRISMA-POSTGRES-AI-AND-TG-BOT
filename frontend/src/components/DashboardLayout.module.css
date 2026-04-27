@@ -1,16 +1,20 @@
 .shell {
   display: grid;
   grid-template-columns: 15rem 1fr;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  height: 100vh;
+  min-height: 0;
   padding: 1.75rem 1.35rem;
   border-radius: 0;
   border-right-color: var(--panel-border);
+  overflow: hidden;
 }
 
 .brandButton {
@@ -26,7 +30,14 @@
   gap: 0.55rem;
 }
 
+.nav {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
 .footer {
+  flex-shrink: 0;
   margin-top: auto;
 }
 
@@ -57,6 +68,9 @@
 }
 
 .dashboard {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
   padding: 2rem clamp(1rem, 2vw, 3rem) 2.5rem;
   animation: rise-in 500ms ease both;
 }
@@ -102,22 +116,31 @@
 @media (max-width: 980px) {
   .shell {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .sidebar {
     position: sticky;
     top: 0;
     z-index: 5;
+    height: auto;
     border-right: 0;
     border-bottom: 1px solid var(--panel-border);
+    overflow: visible;
   }
 
   .nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    padding-right: 0;
   }
 
   .header {
     flex-direction: column;
+  }
+
+  .dashboard {
+    overflow: visible;
   }
 }
 
