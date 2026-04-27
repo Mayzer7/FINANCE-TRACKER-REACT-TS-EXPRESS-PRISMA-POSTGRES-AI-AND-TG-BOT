@@ -25,12 +25,14 @@
 }
 
 .nav,
-.footer {
+.footer,
+.drawerNav {
   display: grid;
   gap: 0.55rem;
 }
 
-.nav {
+.nav,
+.drawerNav {
   min-height: 0;
   overflow-y: auto;
   padding-right: 0.2rem;
@@ -68,11 +70,112 @@
 }
 
 .dashboard {
+  position: relative;
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
   padding: 2rem clamp(1rem, 2vw, 3rem) 2.5rem;
   animation: rise-in 500ms ease both;
+}
+
+.mobileTopbar {
+  display: none;
+}
+
+.burgerButton,
+.closeButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 1rem;
+  border: 1px solid var(--panel-border);
+  background: color-mix(in srgb, var(--bg-elevated) 82%, transparent);
+  color: var(--text);
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-base);
+}
+
+.burgerButton:hover,
+.closeButton:hover {
+  background: var(--interactive-hover-bg);
+  border-color: var(--interactive-hover-border);
+  transform: translateY(-1px);
+}
+
+.burgerButton span {
+  position: absolute;
+  width: 1.15rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.burgerButton span:nth-child(1) {
+  transform: translateY(-0.35rem);
+}
+
+.burgerButton span:nth-child(2) {
+  transform: translateY(0);
+}
+
+.burgerButton span:nth-child(3) {
+  transform: translateY(0.35rem);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  background: rgba(8, 12, 11, 0.58);
+  backdrop-filter: blur(6px);
+  animation: fade-in 220ms ease both;
+}
+
+.mobileDrawer {
+  position: fixed;
+  top: 0.9rem;
+  left: 0.9rem;
+  bottom: 0.9rem;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  width: min(21rem, calc(100vw - 1.8rem));
+  padding: 1.2rem;
+  border-radius: 1.75rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, white 8%), var(--panel)),
+    var(--panel);
+  animation: drawer-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.closeButton span {
+  position: absolute;
+  width: 1rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.closeButton span:first-child {
+  transform: rotate(45deg);
+}
+
+.closeButton span:last-child {
+  transform: rotate(-45deg);
 }
 
 .header {
@@ -113,6 +216,28 @@
   color: var(--negative);
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(-18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
 @media (max-width: 980px) {
   .shell {
     grid-template-columns: 1fr;
@@ -120,33 +245,43 @@
   }
 
   .sidebar {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--panel-border);
-    overflow: visible;
+    display: none;
   }
 
-  .nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .dashboard {
     overflow: visible;
-    padding-right: 0;
+    padding-top: 1rem;
+  }
+
+  .mobileTopbar {
+    position: sticky;
+    top: 0.85rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.95rem 1rem;
+    border-radius: 1.5rem;
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
   }
 
   .header {
     flex-direction: column;
   }
-
-  .dashboard {
-    overflow: visible;
-  }
 }
 
 @media (max-width: 640px) {
-  .nav {
-    grid-template-columns: 1fr;
+  .dashboard {
+    padding-inline: 0.85rem;
+    padding-bottom: 1.75rem;
+  }
+
+  .mobileTopbar {
+    top: 0.65rem;
+    margin-bottom: 1.2rem;
+    padding: 0.85rem 0.9rem;
   }
 
   .summaryRow {
