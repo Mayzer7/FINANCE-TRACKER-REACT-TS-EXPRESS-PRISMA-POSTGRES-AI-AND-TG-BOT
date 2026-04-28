@@ -1,3 +1,5 @@
+![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/1bff534b5dc6dadc4954b865c2c02f46221da144/screenshots/1.jpg)
+
 # Aura Finance
 
 Aura Finance is a full-stack сервис для учета личных финансов с веб-интерфейсом, Telegram-ботом и AI-помощником. Проект помогает фиксировать доходы и расходы, управлять целями накоплений, видеть текущий баланс и выгружать данные в Excel.
