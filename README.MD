@@ -1,40 +1,78 @@
 # Aura Finance
 
-Локальный full-stack проект для учёта личных финансов:
+Aura Finance is a full-stack сервис для учета личных финансов с веб-интерфейсом, Telegram-ботом и AI-помощником. Проект помогает фиксировать доходы и расходы, управлять целями накоплений, видеть текущий баланс и выгружать данные в Excel.
 
-- `frontend`: React + TypeScript + Vite
-- `backend`: Express + TypeScript + Prisma
-- `database`: PostgreSQL в Docker
-- `telegram bot`: быстрый ввод доходов и расходов в тот же аккаунт
+## Features
 
-## Быстрый старт
+- Регистрация и вход по `email/password`
+- Учет доходов и расходов в одном аккаунте
+- Категории операций с разделением по типам
+- История всех транзакций и сводка по балансу
+- Финансовые цели с прогрессом накоплений
+- AI-чат по целям на основе данных пользователя
+- Подключение Telegram-бота для быстрого ввода операций
+- Excel export для расходов, доходов, транзакций, целей и категорий
+- Профиль пользователя с настройкой баланса и Telegram linking
 
-### 1. Поднять базу
+## Tech Stack
+
+- Frontend: `React`, `TypeScript`, `Vite`, `React Router`
+- Backend: `Express`, `TypeScript`, `Prisma`, `Zod`, `JWT`, `OpenAI SDK`, `Telegraf`
+- Database: `PostgreSQL` в `Docker`
+- Export/runtime libraries: `ExcelJS`, `FileSaver`
+
+## Project Structure
+
+- `frontend` - клиентское приложение на React
+- `backend` - API, бизнес-логика, Prisma и Telegram-бот
+- `docker-compose.yml` - локальный PostgreSQL для разработки
+
+## Quick Start
+
+### 1. Start PostgreSQL
+
+Из корня проекта:
 
 ```powershell
 docker compose up -d postgres
 ```
 
-### 2. Настроить backend
+PostgreSQL поднимается на `localhost:5433`, чтобы не конфликтовать с локальной установкой на `5432`.
 
-Файл окружения:
+### 2. Configure backend
+
+Файлы окружения:
 
 - `backend/.env`
 - пример: `backend/.env.example`
 
-Минимальные переменные:
+Минимальный пример `backend/.env`:
 
 ```env
 PORT=4000
 CLIENT_ORIGIN=http://localhost:5173
 APP_URL=http://localhost:5173
-DATABASE_URL=postgresql://postgres:postgres@localhost:5433/aura_finance?schema=public
-JWT_SECRET=local-development-secret
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_BOT_USERNAME=
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/aura_finance?schema=public"
+JWT_SECRET="change-me-in-production"
+OPENAI_API_KEY=""
+OPENAI_MODEL="gpt-5.4-mini"
+TELEGRAM_BOT_TOKEN=""
+TELEGRAM_BOT_USERNAME=""
 ```
 
-Инициализация:
+Описание переменных:
+
+- `PORT` - порт backend API
+- `CLIENT_ORIGIN` - origin фронтенда для CORS
+- `APP_URL` - публичный URL приложения, который используется, в том числе, в сценариях Telegram
+- `DATABASE_URL` - строка подключения к PostgreSQL
+- `JWT_SECRET` - секрет для подписи JWT-токенов
+- `OPENAI_API_KEY` - API key для AI-функций, в том числе чата по финансовым целям
+- `OPENAI_MODEL` - модель OpenAI для AI-функций, по умолчанию `gpt-5.4-mini`
+- `TELEGRAM_BOT_TOKEN` - токен Telegram-бота
+- `TELEGRAM_BOT_USERNAME` - username Telegram-бота без обязательного префикса `@`
+
+### 3. Run backend
 
 ```powershell
 cd backend
@@ -45,7 +83,7 @@ npm run prisma:seed
 npm run dev
 ```
 
-### 3. Запустить frontend
+### 4. Run frontend
 
 ```powershell
 cd frontend
@@ -53,22 +91,16 @@ npm install
 npm run dev
 ```
 
-Приложение:
+Приложение будет доступно по адресам:
 
 - frontend: [http://localhost:5173](http://localhost:5173)
 - backend health: [http://localhost:4000/api/health](http://localhost:4000/api/health)
 
-## Telegram bot и `APP_URL`
+## Telegram and `APP_URL`
 
-Telegram умеет открывать кнопкой только публичные HTTPS URL. Локальные адреса вроде:
+Telegram умеет открывать кнопкой только публичные `HTTPS` URL. Локальные адреса вроде `http://localhost:5173` подходят для обычной локальной разработки, но не для кликабельного перехода из Telegram.
 
-- `http://localhost:5173`
-- `http://127.0.0.1:5173`
-- private LAN IP
-
-для inline-кнопок в Telegram не подходят.
-
-### Режим 1: локальная разработка без tunnel
+### Local dev without tunnel
 
 ```env
 APP_URL=http://localhost:5173
@@ -76,13 +108,13 @@ APP_URL=http://localhost:5173
 
 В этом режиме:
 
-- бот не падает
-- бот пишет понятный текст с адресом сайта
+- backend и бот продолжают работать локально
+- бот может отправлять текстовую подсказку с адресом сайта
 - ссылку нужно открыть вручную в браузере
 
-### Режим 2: кликабельный переход из Telegram в dev
+### Local dev with HTTPS tunnel
 
-Используйте публичный HTTPS tunnel URL, например через:
+Для кликабельного перехода из Telegram используйте публичный tunnel URL, например через:
 
 - `ngrok`
 - `cloudflared`
@@ -96,20 +128,19 @@ APP_URL=https://example-tunnel.ngrok-free.app
 
 В этом режиме:
 
-- кнопка `Открыть сайт` в Telegram становится кликабельной
-- Telegram показывает стандартное окно подтверждения перехода
-- привязка бота и переходы на страницы сайта работают как в production
+- кнопка перехода из Telegram становится кликабельной
+- deep links и переходы в веб-приложение работают ближе к production-сценарию
 
-После смены `APP_URL` перезапустите backend.
+После изменения `APP_URL` перезапустите backend.
 
-## Demo-аккаунт
+## Demo Account
 
-После `npm run prisma:seed`:
+После `npm run prisma:seed` доступен demo-аккаунт:
 
 - email: `demo@aurafinance.local`
 - password: `demodemo`
 
-## Полезные команды
+## Useful Commands
 
 ### Backend
 
