@@ -15,6 +15,41 @@ type CategoryGroupProps = {
   onDelete: (category: Category) => void;
 };
 
+function EditIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none">
+      <path
+        d="M4.75 19.25h3.2l8.88-8.88a1.5 1.5 0 0 0 0-2.12l-1.08-1.08a1.5 1.5 0 0 0-2.12 0l-8.88 8.88v3.2Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m12.75 8.25 3 3"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none">
+      <path
+        d="M9 4.75h6m-8 3h10m-7 3.25v5.5m4-5.5v5.5M8.75 19h6.5a1 1 0 0 0 .99-.88l.88-9.37H7.88l.88 9.37a1 1 0 0 0 .99.88Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function CategoryGroup({
   title,
   type,
@@ -51,18 +86,20 @@ function CategoryGroup({
             </div>
             <div className={styles.cardActions}>
               <button
-                className={`text-button ${pageStyles.textButton}`}
+                className={styles.iconButton}
                 type="button"
                 onClick={() => onEdit(category)}
+                aria-label={`Редактировать категорию ${category.name}`}
               >
-                Редактировать
+                <EditIcon />
               </button>
               <button
-                className={`text-button ${pageStyles.textButton}`}
+                className={`${styles.iconButton} ${styles.deleteButton}`}
                 type="button"
                 onClick={() => onDelete(category)}
+                aria-label={`Удалить категорию ${category.name}`}
               >
-                Удалить
+                <TrashIcon />
               </button>
             </div>
           </article>
@@ -146,11 +183,11 @@ export function CategoriesPage() {
       <div className={styles.grid}>
         <CategoryGroup
           title="Категории расходов"
-          type="expense"  
+          type="expense"
           categories={expenseCategories}
-          onCreate={(type) => {
+          onCreate={(nextType) => {
             setActiveCategory(null);
-            setModalType(type);
+            setModalType(nextType);
             setIsModalOpen(true);
           }}
           onEdit={(category) => {
@@ -163,9 +200,9 @@ export function CategoriesPage() {
           title="Категории доходов"
           type="income"
           categories={incomeCategories}
-          onCreate={(type) => {
+          onCreate={(nextType) => {
             setActiveCategory(null);
-            setModalType(type);
+            setModalType(nextType);
             setIsModalOpen(true);
           }}
           onEdit={(category) => {
