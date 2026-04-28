@@ -1,14 +1,25 @@
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/1bff534b5dc6dadc4954b865c2c02f46221da144/screenshots/1.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/2.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/3.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/4.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/5.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/6.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/7.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/8.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/9.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/10.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/11.jpg)
+<br>
 ![image alt](https://github.com/Mayzer7/FINANCE-TRACKER-REACT-TS-EXPRESS-PRISMA-POSTGRES-AI-AND-TG-BOT/blob/21a28b03d50b927f74765293fd27b082b4bbad57/screenshots/12.jpg)
 
 # Aura Finance
