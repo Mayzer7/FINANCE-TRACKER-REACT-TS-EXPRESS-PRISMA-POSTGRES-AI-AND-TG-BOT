@@ -350,11 +350,11 @@ export function LandingPage() {
             </div>
             <div className={styles.goalMeta}>
               <div>
-                <span>Собрано</span>
+                <span>Собрано </span>
                 <strong>₽ 80 400</strong>
               </div>
               <div>
-                <span>Осталось</span>
+                <span>Осталось </span>
                 <strong>₽ 39 600</strong>
               </div>
             </div>
