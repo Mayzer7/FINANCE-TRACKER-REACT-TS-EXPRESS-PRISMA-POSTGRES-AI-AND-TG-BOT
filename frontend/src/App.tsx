@@ -4,6 +4,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { FinanceProvider } from "@/contexts/FinanceContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useAuth } from "@/hooks/useAuth";
 import { ExpensesPage } from "@/pages/ExpensesPage";
 import { GoalsPage } from "@/pages/GoalsPage";
@@ -29,12 +30,19 @@ function AuthEntryRedirect() {
   return <Navigate to="/login" replace />;
 }
 
+function DocumentTitleManager() {
+  useDocumentTitle();
+
+  return null;
+}
+
 function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <FinanceProvider>
           <BrowserRouter>
+            <DocumentTitleManager />
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
